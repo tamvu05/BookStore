@@ -1,0 +1,28 @@
+<h1>Các thể loại</h1>
+<ul class="list-the-loai">
+    <% data.forEach(theloai=> { %>
+        <li>
+            <h4>Tên thể loại: <%= theloai.TenTL %></h4>
+            <h4>Ghi chú: <%= theloai.GhiChu %></h4>
+            <button class="btn-xoa" data-id="<%= theloai.MaTL %>">Xóa</button> 
+            <button class="btn-sua" data-id="<%= theloai.MaTL %>" 
+                data-ten="<%= theloai.TenTL %>" 
+                data-ghichu="<%= theloai.GhiChu %>">Sửa</button> 
+        </li>
+    <% }) %>
+</ul>
+
+<br>
+
+<form action="">
+    <h1>Thêm thể loại</h1>
+    <div class="mb-3">
+        <label for="ten-tl" class="form-label">Tên thể loại</label>
+        <input type="text" class="form-control" id="ten-tl">
+    </div>
+    <div class="mb-3">
+        <label for="ghi-chu" class="form-label">Ghi chú</label>
+        <input type="text" class="form-control" id="ghi-chu">
+    </div>
+    <button type="button" class="btn btn-primary btn-them">Thêm thể loại</button>
+</form>

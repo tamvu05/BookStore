@@ -4,22 +4,33 @@ import helmet from 'helmet'
 import compression from 'compression'
 import router from './routers/index.js'
 import dotenv from 'dotenv'
+import path from 'path'
+import expressEjsLayouts from 'express-ejs-layouts'
+import { title } from 'process'
 
 dotenv.config()
 const app = express()
+const __dirname = import.meta.dirname
 
 // init middlewares
+app.use(express.json()) // For parsing application/json
+app.use(express.urlencoded({ extended: true }))
+app.use(express.static(path.join(__dirname, 'public')))
 app.use(morgan('dev'))
 app.use(helmet())
 app.use(compression())
+
+app.set('view engine', 'ejs')
+app.set('views', path.join(__dirname, 'views'))
+app.use(expressEjsLayouts)
+app.set('layout', 'layouts/adminLayout') // Đặt layout mặc định là adminLayout
 
 // init db
 
 // init routers
 app.use(router)
 
-// handling error
 
-// Test connect db
+
 
 export default app

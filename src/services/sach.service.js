@@ -1,3 +1,4 @@
+import { error } from 'console'
 import SachModel from '../models/sach.model.js'
 
 const SachService = {
