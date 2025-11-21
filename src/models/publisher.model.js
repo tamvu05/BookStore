@@ -11,13 +11,13 @@ const PublisherBanModel = {
         return rows[0] || null
     },
 
-    async create({ TenNXB, DiaChi, Email, SDT }) {
-        const [result] = await pool.query('INSERT INTO NhaXuatBan (TenNXB, DiaChi, Email, SDT) VALUES (?, ?, ?, ?)', [TenNXB, DiaChi, Email, SDT])
+    async create({ TenNXB, MoTa }) {
+        const [result] = await pool.query('INSERT INTO NhaXuatBan (TenNXB, MoTa) VALUES (?, ?)', [TenNXB, MoTa])
         return result.insertId
     },
 
-    async update(id, { TenNXB, DiaChi, Email, SDT }) {
-        const [result] = await pool.query('UPDATE NhaXuatBan SET TenNXB = ?, DiaChi = ?, Email = ?, SDT = ? WHERE MaNXB = ?', [TenNXB, DiaChi, Email, SDT, id])
+    async update(id, { TenNXB, MoTa }) {
+        const [result] = await pool.query('UPDATE NhaXuatBan SET TenNXB = ?, MoTa = ? WHERE MaNXB = ?', [TenNXB, MoTa, id])
         return result.affectedRows > 0
     },
 

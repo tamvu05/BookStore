@@ -1,22 +1,22 @@
 import AuthorService from '../services/author.service.js'
 
 const AuthorController = {
-    // GET /author
+    // GET /admin/author
     async getAll(req, res, next) {
         try {
             const data = await AuthorService.getAll()
-            res.json(data)
+            return res.json(data)
         } catch (err) {
             next(err)
         }
     },
 
-    // GET /author/:id
+    // GET /admin/author/:id
     async getById(req, res, next) {
         try {
             const { id } = req.params
             const data = await AuthorService.getById(id)
-            res.json(data)
+            return res.json(data)
         } catch (err) {
             next(err)
         }
@@ -37,7 +37,7 @@ const AuthorController = {
         try {
             const { id } = req.params
             const data = await AuthorService.update(id, req.body)
-            res.json(data)
+            return res.json(data)
         } catch (err) {
             next(err)
         }
@@ -48,7 +48,7 @@ const AuthorController = {
         try {
             const { id } = req.params
             const success = await AuthorService.delete(id)
-            res.json({ success })
+            return res.json({ success })
         } catch (err) {
             next(err)
         }

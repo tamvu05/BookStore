@@ -15,14 +15,14 @@ const AuthorService = {
     },
 
     async create(payload) {
-        const { TenTG, GhiChu } = payload
+        const { TenTG, MoTa } = payload
 
         // Validate nghiệp vụ
         if (!TenTG || TenTG.trim() === '') {
             throw new Error('Tên tác giả là bắt buộc')
         }
 
-        const insertId = await AuthorModel.create({ TenTG, GhiChu })
+        const insertId = await AuthorModel.create({ TenTG, MoTa })
 
         return await AuthorModel.getById(insertId)
     },
@@ -33,13 +33,13 @@ const AuthorService = {
         const exist = await AuthorModel.getById(id)
         if (!exist) throw new Error('Tác giả không tồn tại')
 
-        const { TenTG, GhiChu } = payload
+        const { TenTG, MoTa } = payload
 
         if (!TenTG || TenTG.trim() === '') {
             throw new Error('Tên tác giả là bắt buộc')
         }
 
-        const success = await AuthorModel.update(id, { TenTG, GhiChu })
+        const success = await AuthorModel.update(id, { TenTG, MoTa })
         if (!success) throw new Error('Cập nhật thất bại')
 
         return await AuthorModel.getById(id)

@@ -1,0 +1,27 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+/* CHỈNH TỐC ĐỘ HIỆN MODAL */
+.modal.fade .modal-dialog {
+    transition: transform 0.05s ease-out;
+}
+
+.modal.fade {
+    transition: opacity 0.05s linear;
+}
+
+
+/* VALIDATE VALUE */
+.invalid-value {
+    font-size: 13px;
+    color: red;
+    display: none;
+}
+
+.invalid-value.active {
+    display: block;
+}

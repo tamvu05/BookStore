@@ -6,8 +6,8 @@ const BookController = {
         try {
             const data = await BookService.getAll()
             res.render('admin/book', {
-                title: 'Admin Dashboard',
-                data
+                title: 'Quản lý sách',
+                data,
             })
         } catch (err) {
             next(err)
@@ -19,7 +19,7 @@ const BookController = {
         try {
             const { id } = req.params
             const data = await BookService.getById(id)
-            res.json(data)
+            return res.json(data)
         } catch (err) {
             next(err)
         }
@@ -32,7 +32,7 @@ const BookController = {
             res.render('user/book', {
                 title: 'Nhà sách ...',
                 layout: res.userLayout,
-                data
+                data,
             })
         } catch (err) {
             next(err)
@@ -44,7 +44,7 @@ const BookController = {
         try {
             const { id } = req.params
             const data = await BookService.getById(id)
-            res.json(data)
+            return res.json(data)
         } catch (err) {
             next(err)
         }
@@ -65,7 +65,7 @@ const BookController = {
         try {
             const { id } = req.params
             const data = await BookService.update(id, req.body)
-            res.json(data)
+            return res.json(data)
         } catch (err) {
             next(err)
         }
@@ -76,7 +76,7 @@ const BookController = {
         try {
             const { id } = req.params
             const success = await BookService.delete(id)
-            res.json({ success })
+            return res.json({ success })
         } catch (err) {
             next(err)
         }
@@ -89,7 +89,7 @@ const BookController = {
             const { amount } = req.body
 
             const data = await BookService.updateStock(id, Number(amount))
-            res.json(data)
+            return res.json(data)
         } catch (err) {
             next(err)
         }

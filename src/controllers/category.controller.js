@@ -1,40 +1,33 @@
-import CategoryService from  '../services/category.service.js'
+import CategoryService from '../services/category.service.js'
 
 const CategoryController = {
+
     // GET /admin/category
-    async getAll(req, res, next) {
+    async getViewAll(req, res, next) {
         try {
-            const data = await CategoryService.getAll()
-            console.log(data);
-            res.render('admin/category', {
-                title: 'Admin Dashboard',
-                data,
-                scripts: ['/js/category.admin.js']
+            const categories = await CategoryService.getAll()
+            res.render('admin/viewManager', {
+                scripts: ['/js/category.admin.js'],
+                categories,
+                entityName: 'thể loại',
+                tablePartial: 'partials/category/tableCategory',
+                modalAddSelector: '#add-category-modal',
+                modalAddPartial: 'partials/category/modalAddCategory',
+                modalUpdatePartial: 'partials/category/modalUpdateCategory',
             })
         } catch (err) {
             next(err)
         }
     },
 
-    // GET /admin/category/:id
-    async getById(req, res, next) {
-        try {
-            const { id } = req.params
-            const data = await CategoryService.getById(id)
-            res.json(data)
-        } catch (err) {
-            next(err)
-        }
-    },
-
-// GET /category
+    // GET /category
     async userGetAll(req, res, next) {
         try {
             const data = await CategoryService.getAll()
-             res.render('user/category', {
+            res.render('user/category', {
                 title: 'Nhà sách ...',
                 layout: res.userLayout,
-                data
+                data,
             })
         } catch (err) {
             next(err)
@@ -46,13 +39,33 @@ const CategoryController = {
         try {
             const { id } = req.params
             const data = await CategoryService.getById(id)
-            res.json(data)
+            return res.json(data)
         } catch (err) {
             next(err)
         }
     },
 
+    // GET /api/category/:id
+    async getById(req, res, next) {
+        try {
+            const { id } = req.params
+            const data = await CategoryService.getById(id)
+            return res.json(data)
+        } catch (err) {
+            next(err)
+        }
+    },
 
+    // GET /api/category/check-unique
+    async checkUnique(req, res, next) {
+        try {
+            const name = req.query.name
+            const result = await CategoryService.checkUnique(name)
+            return res.json({ isUnique: result })
+        } catch (error) {
+            next(error)
+        }
+    },
 
     // POST /api/category
     async create(req, res, next) {
@@ -69,7 +82,7 @@ const CategoryController = {
         try {
             const { id } = req.params
             const data = await CategoryService.update(id, req.body)
-            res.json(data)
+            return res.json(data)
         } catch (err) {
             next(err)
         }
@@ -80,11 +93,12 @@ const CategoryController = {
         try {
             const { id } = req.params
             const success = await CategoryService.delete(id)
-            res.json({ success })
+            return res.json({ success })
         } catch (err) {
             next(err)
         }
     },
+    
 }
 
 export default CategoryController

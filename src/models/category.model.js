@@ -11,13 +11,13 @@ const CategoryModel = {
         return rows[0] || null
     },
 
-    async create({ TenTL, GhiChu }) {
-        const [result] = await pool.query('INSERT INTO TheLoai (TenTL, GhiChu) VALUES (?, ?)', [TenTL, GhiChu])
+    async create({ TenTL, MoTa }) {
+        const [result] = await pool.query('INSERT INTO TheLoai (TenTL, MoTa) VALUES (?, ?)', [TenTL, MoTa])
         return result.insertId
     },
 
-    async update(id, { TenTL, GhiChu }) {
-        const [result] = await pool.query('UPDATE TheLoai SET TenTL = ?, GhiChu = ? WHERE MaTL = ?', [TenTL, GhiChu, id])
+    async update(id, { TenTL, MoTa }) {
+        const [result] = await pool.query('UPDATE TheLoai SET TenTL = ?, MoTa = ? WHERE MaTL = ?', [TenTL, MoTa, id])
         return result.affectedRows > 0
     },
 
@@ -25,6 +25,11 @@ const CategoryModel = {
         const [result] = await pool.query('DELETE FROM TheLoai WHERE MaTL = ?', [id])
         return result.affectedRows > 0
     },
+
+    async getByName(TenTL) {
+        const [rows] = await pool.query('SELECT * FROM TheLoai WHERE TenTL like ?', [TenTL])
+        return rows[0] || null
+    }
 }
 
 export default CategoryModel

@@ -15,16 +15,14 @@ const PublisherService = {
     },
 
     async create(payload) {
-        const { TenNXB, DiaChi, Email, SDT } = payload
+        const { TenNXB, MoTa } = payload
 
         // Validate nghiệp vụ
         if (!TenNXB || TenNXB.trim() === '') throw new Error('Tên nhà xuất bản là bắt buộc')
 
         const insertId = await PublisherModel.create({
             TenNXB,
-            DiaChi,
-            Email,
-            SDT,
+            MoTa
         })
 
         return await PublisherModel.getById(insertId)
@@ -36,15 +34,13 @@ const PublisherService = {
         const exist = await PublisherModel.getById(id)
         if (!exist) throw new Error('Nhà xuất bản không tồn tại')
 
-        const { TenNXB, DiaChi, Email, SDT } = payload
+        const { TenNXB, MoTa } = payload
 
         if (!TenNXB || TenNXB.trim() === '') throw new Error('Tên nhà xuất bản là bắt buộc')
 
         const success = await PublisherModel.update(id, {
             TenNXB,
-            DiaChi,
-            Email,
-            SDT,
+            MoTa
         })
 
         if (!success) throw new Error('Cập nhật thất bại')

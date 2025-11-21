@@ -15,14 +15,14 @@ const CategoryService = {
     },
 
     async create(payload) {
-        const { TenTL, GhiChu } = payload
+        const { TenTL, MoTa } = payload
 
         // Validate nghiệp vụ
         if (!TenTL || TenTL.trim() === '') {
             throw new Error('Tên thể loại là bắt buộc')
         }
 
-        const insertId = await CategoryModel.create({ TenTL, GhiChu })
+        const insertId = await CategoryModel.create({ TenTL, MoTa })
         return await CategoryModel.getById(insertId)
     },
 
@@ -32,13 +32,13 @@ const CategoryService = {
         const exist = await CategoryModel.getById(id)
         if (!exist) throw new Error('Thể loại không tồn tại')
 
-        const { TenTL, GhiChu } = payload
+        const { TenTL, MoTa } = payload
 
         if (!TenTL || TenTL.trim() === '') {
             throw new Error('Tên thể loại là bắt buộc')
         }
 
-        const success = await CategoryModel.update(id, { TenTL, GhiChu })
+        const success = await CategoryModel.update(id, { TenTL, MoTa })
         if (!success) throw new Error('Cập nhật thất bại')
 
         return await CategoryModel.getById(id)
@@ -53,6 +53,14 @@ const CategoryService = {
         const success = await CategoryModel.delete(id)
         if (!success) throw new Error('Xóa thất bại')
 
+        return true
+    },
+
+    async checkUnique(TenTL) {
+        if (!TenTL) throw new Error('Thiếu tên thể loại')
+
+        const exist = await CategoryModel.getByName(TenTL)
+        if(exist) return false
         return true
     },
 }
