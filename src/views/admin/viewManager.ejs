@@ -1,0 +1,48 @@
+<div class="container-fluid py-3">
+    <h1 class="mb-4">Quản lý <%= entityName %>
+    </h1>
+
+    <div class="row mb-3 justify-content-between">
+        <div class="col-auto">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="<%= modalAddSelector %>">
+                <i class="fas fa-plus"></i> Thêm <%= entityName %>
+            </button>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-success">
+                Xuất excel <i class="far fa-file-excel"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Tìm kiếm theo tên <%= entityName %>">
+                <button class="btn btn-search" type="button" style="background-color: #6f42c1; color: white;">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <table class="table table-striped table-hover align-middle">
+                <!-- table manager -->
+                <%- include(tablePartial) %>
+            </table>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+    </div>
+
+    <%- include('partials/pagination') %>
+</div>
+
+<!-- Modal Add -->
+ <%- include(modalAddPartial) %>
+
+ <!-- Modal Update -->
+ <%- include(modalUpdatePartial) %>

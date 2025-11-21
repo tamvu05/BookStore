@@ -1,0 +1,30 @@
+/* Trạng thái mở mặc định */
+#sidebar-wrapper {
+    width: 250px; 
+    transition: margin-left 0.25s ease-out; 
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: -250px; 
+}
+
+#page-content-wrapper {
+    width: 100%;
+}
+
+/* Độ rộng của các cột trong table */
+.category-table th:nth-child(1) {
+    width: 5%; 
+}
+
+.category-table th:nth-child(2) {
+    width: 30%; 
+}
+
+.category-table th:nth-child(3) {
+    width: 50%; 
+}
+
+.category-table th:nth-child(4) {
+    width: 15%; 
+}

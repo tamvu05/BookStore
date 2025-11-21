@@ -6,7 +6,6 @@ import router from './routers/index.js'
 import dotenv from 'dotenv'
 import path from 'path'
 import expressEjsLayouts from 'express-ejs-layouts'
-import { title } from 'process'
 
 dotenv.config()
 const app = express()
@@ -17,7 +16,31 @@ app.use(express.json()) // For parsing application/json
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(morgan('dev'))
-app.use(helmet())
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                'style-src': [
+                    "'self'",
+                    'https://cdn.jsdelivr.net',
+                    'https://ka-f.fontawesome.com',
+                    "'unsafe-inline'",
+                ],
+                'script-src': [
+                    "'self'",
+                    'https://cdn.jsdelivr.net',
+                    'https://kit.fontawesome.com',
+                ],
+                'connect-src': [
+                    "'self'",
+                    'https://cdn.jsdelivr.net',
+                    'https://ka-f.fontawesome.com',
+                ],
+                'font-src': ["'self'", 'https://ka-f.fontawesome.com'],
+            },
+        },
+    })
+)
 app.use(compression())
 
 app.set('view engine', 'ejs')
@@ -29,8 +52,5 @@ app.set('layout', 'layouts/adminLayout') // Đặt layout mặc định là admi
 
 // init routers
 app.use(router)
-
-
-
 
 export default app
