@@ -44,8 +44,9 @@ if (btnAddCategory) {
                 )
 
             const dataAttributeElement = tableWrapper.querySelector('#data-attribute')
+            const targetPage = dataAttributeElement.dataset.totalPage
 
-            updateView(dataAttributeElement.dataset.totalPage)
+            updateView(targetPage)
             showToast('Đã thêm thể loại', 'success')
 
             if (addModal) {
@@ -212,7 +213,8 @@ if (btnUpdate) {
                         `Lỗi HTTP ${res.status}: Thao tác thất bại.`
                 )
 
-            updateView(1)
+            const dataAttributeElement = tableWrapper.querySelector('#data-attribute')
+            updateView(dataAttributeElement.dataset.currentPage)
             showToast('Đã cập nhật thể loại', 'success')
 
             if (updateModal) {
