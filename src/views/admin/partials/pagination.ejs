@@ -10,6 +10,12 @@
     }
 %>
 
+<!-- Nếu chỉ có 1 page thì kh trả html phân trang -->
+<% if (totalPage < 2) { %>
+  <% return '' %>
+<% } %>
+
+<!-- Khi có nhiều page -->
 <nav aria-label="Page navigation example">
   <ul class="pagination d-flex justify-content-center">
     <li class="page-item">

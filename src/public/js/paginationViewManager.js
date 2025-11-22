@@ -1,3 +1,5 @@
+import showToast from './toast.js'
+
 const paginationZone = document.querySelector('#pagination-view-manager')
 
 if (paginationZone) {
@@ -22,6 +24,10 @@ async function updateView(page = 1) {
         const res = await fetch(`/api/category/partials?page=${page}`)
         const data = await res.json()
 
+        if (!res.ok) {
+            throw new Error(data.message || `Lỗi không xác định: ${res.status}`)
+        }
+
         const tableViewElement = document.querySelector('#table-view-manager')
         const paginationElement = document.querySelector(
             '#pagination-view-manager'
@@ -29,6 +35,11 @@ async function updateView(page = 1) {
 
         tableViewElement.innerHTML = data.table
         paginationElement.innerHTML = data.pagination
+
+        // Cập nhật lại URL trình duyệt mà kh reload trang
+        const currentUrl = new URL(window.location.href)
+        currentUrl.searchParams.set('page', page)
+        history.pushState(null, '', currentUrl.toString())
     } catch (error) {
         showToast('Lỗi cập nhật view', 'danger')
     }

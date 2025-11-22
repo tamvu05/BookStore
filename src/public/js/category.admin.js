@@ -275,10 +275,19 @@ async function updateView(page = 1) {
         const res = await fetch(`/api/category/partials?page=${page}`)
         const data = await res.json()
 
+        if(!res.ok) {
+            throw new Error(data.message || `Lỗi không xác định: ${res.status}`)
+        }
+
         if (tableWrapper) tableWrapper.innerHTML = data.table
         if (paginationWrapper) paginationWrapper.innerHTML = data.pagination
+
+        // Cập nhật lại URL trình duyệt mà kh reload trang
+        const currentUrl = new URL(window.location.href)
+        currentUrl.searchParams.set('page', page)
+        history.pushState(null, '', currentUrl.toString())
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         showToast(error.message, 'danger')
     }
 }
