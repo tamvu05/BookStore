@@ -25,9 +25,34 @@
                 <button class="btn btn-outline-light" type="submit">Tìm</button>
             </form>
 
-            <div class="d-flex gap-2">
-                <a href="#" class="btn btn-light text-primary">Đăng nhập</a>
-                <a href="#" class="btn btn-warning">Giỏ hàng (0)</a>
+            <div class="d-flex gap-2 align-items-center">
+    
+                <% if (locals.user) { %>
+                    
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light rounded-pill px-3 fw-semibold btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-user me-1"></i> <%= user.fullname %>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-receipt me-2"></i> Đơn hàng</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user-gear me-2"></i> Tài khoản</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất</a></li>
+                        </ul>
+                    </div>
+
+                <% } else { %>
+                    
+                    <a href="/login" class="btn btn-outline-light rounded-pill px-3 fw-semibold btn-sm">Đăng nhập</a>
+
+                <% } %>
+
+                <a href="#" class="btn btn-light text-primary rounded-pill position-relative btn-sm px-3 shadow-sm">
+                    <i class="bi bi-cart-fill me-1"></i> 
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
+                        0
+                    </span>
+                </a>
             </div>
         </div>
     </div>

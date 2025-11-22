@@ -4,9 +4,11 @@ dotenv.config()
 import express from 'express'
 import morgan from 'morgan'
 import compression from 'compression'
+import session from 'express-session'
 import router from './routers/index.js'
 import path from 'path'
 import expressEjsLayouts from 'express-ejs-layouts'
+
 const app = express()
 const __dirname = import.meta.dirname
 
@@ -16,6 +18,25 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(morgan('dev'))
 app.use(compression())
+
+// CẤU HÌNH SESSION (Thêm đoạn này) 
+app.use(session({
+    secret: 'secret-key-cua-du-an-nay', // Chuỗi bí mật (đặt gì cũng được)
+    resave: false,
+    saveUninitialized: true,
+    cookie: { 
+        secure: false, // Localhost dùng http nên để false. Khi nào lên https thì sửa thành true
+        maxAge: 24 * 60 * 60 * 1000 // Session sống trong 24 giờ
+    }
+}));
+
+// TRUYỀN USER XUỐNG VIEW (Thêm đoạn này) 
+// Giúp tất cả file .ejs đều dùng được biến 'user' mà không cần truyền thủ công ở từng Controller
+app.use((req, res, next) => {
+    res.locals.user = req.session.user || null; 
+    next();
+});
+// --------------------------------------------
 
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
