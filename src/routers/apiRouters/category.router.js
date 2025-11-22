@@ -5,6 +5,8 @@ const router = express.Router()
 
 router.get('/check-unique', CategoryController.checkUnique)
 
+router.get('/partials', CategoryController.getPartials)
+
 router.post('/', CategoryController.create)
 
 router.put('/:id', CategoryController.update)

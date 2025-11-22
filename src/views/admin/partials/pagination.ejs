@@ -1,21 +1,64 @@
-<% const LIMIT = 10 %>
-<% const prevPage = currentPage - 1 < 1 ? totalPage : currentPage - 1 %>
-<% const nextPage = currentPage + 1 > totalPage ? 1 : currentPage + 1 %>
+<%  
+    const PAGE_WINDOW = 5
+    const prevPage = currentPage - 1 < 1 ? totalPage : currentPage - 1
+    const nextPage = currentPage + 1 > totalPage ? 1 : currentPage + 1
+    let startPage = Math.max(currentPage - Math.floor(PAGE_WINDOW / 2), 1)
+    let endPage = Math.min(startPage + PAGE_WINDOW - 1, totalPage)
+
+    if(totalPage >= PAGE_WINDOW && endPage - startPage < PAGE_WINDOW) {
+        startPage -= PAGE_WINDOW - (endPage - startPage + 1)
+    }
+%>
 
 <nav aria-label="Page navigation example">
   <ul class="pagination d-flex justify-content-center">
     <li class="page-item">
-      <a class="page-link" href="<%= hrefPagination %>?page=<%= prevPage %>&limit=<%= LIMIT %>" aria-label="Previous">
+      <a class="page-link" href="<%= hrefPagination %>?page=<%= prevPage %>" aria-label="Previous">
         <span aria-hidden="true">&laquo;</span>
       </a>
     </li>
 
-    <% for( let i=1; i <=totalPage; i++ ) { %>
-      <li class="page-item"><a class="page-link" href="<%= hrefPagination %>?page=<%= i %>&limit=<%= LIMIT %>"><%= i %></a></li>
+    <% if (startPage > 1) { %>
+      <li class="page-item">
+          <a class="page-link" 
+            href="<%= hrefPagination %>?page=1"> 1
+          </a>
+      </li>
+    <% } %>
+
+    <% if (startPage > 2) { %>
+      <li class="page-item disabled">
+          <span class="page-link"> ... </span>
+      </li>
+    <% } %>
+
+    <% for( let i=startPage; i <=endPage; i++ ) { %>
+      <li class="page-item">
+          <% if (i === currentPage) { %>
+              <span class="page-link active"><%= i %></span>
+          <% } else { %>
+              <a class="page-link" href="<%= hrefPagination %>?page=<%= i %>"><%= i %></a>
+          <% } %>
+          
+      </li>
+    <% } %>
+
+    <% if (endPage < totalPage - 1) { %>
+      <li class="page-item disabled">
+          <span class="page-link"> ... </span>
+      </li>
+    <% } %>
+
+    <% if (endPage < totalPage) { %>
+      <li class="page-item">
+          <a class="page-link" 
+            href="<%= hrefPagination %>?page=<%= totalPage %>"><%= totalPage %>
+          </a>
+      </li>
     <% } %>
 
     <li class="page-item">
-      <a class="page-link" href="<%= hrefPagination %>?page=<%= nextPage %>&limit=<%= LIMIT %>" aria-label="Next">
+      <a class="page-link" href="<%= hrefPagination %>?page=<%= nextPage %>" aria-label="Next">
         <span aria-hidden="true">&raquo;</span>
       </a>
     </li>

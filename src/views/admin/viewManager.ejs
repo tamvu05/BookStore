@@ -26,21 +26,17 @@
         </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <table class="table table-striped table-hover align-middle">
-                <!-- table manager -->
-                <%- include(tablePartial) %>
-            </table>
-        </table>
+    <div class="table-responsive" id="table-view-manager">
+        <!-- table manager -->
+        <%- include(tablePartial) %>
     </div>
 
     <div class="d-flex justify-content-center mt-4">
     </div>
 
-    <% if (totalPage > 1) { %>
+    <div id="pagination-view-manager">
         <%- include('partials/pagination') %>
-    <% } %>
+    </div>
 </div>
 
 <!-- Modal Add -->
@@ -48,3 +44,6 @@
 
  <!-- Modal Update -->
  <%- include(modalUpdatePartial) %>
+
+<script src="/js/paginationViewManager.js"></script>
+ 

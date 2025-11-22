@@ -1,12 +1,15 @@
 import CategoryModel from '../models/category.model.js'
 import BookModel from '../models/book.model.js'
+import {createHttpError} from '../utils/errorUtil.js'
+
+const LIMIT = 8
 
 const CategoryService = {
-    async getAll(page, limit) {
+    async getAll(page) {
         let currentPage = Number(page)
-        limit = Number(limit)
+        let limit = Number(LIMIT)
 
-        if (isNaN(limit) || limit < 4 || limit > 20) limit = 10
+        if (isNaN(limit) || limit < 2 || limit > 20) limit = 10
 
         const total = await CategoryModel.getTotal()
         const totalPage = Math.ceil(total / limit)
@@ -38,10 +41,12 @@ const CategoryService = {
     async create(payload) {
         const { TenTL, MoTa } = payload
 
-        // Validate nghiệp vụ
         if (!TenTL || TenTL.trim() === '') {
             throw new Error('Tên thể loại là bắt buộc')
         }
+
+        const exist = await CategoryModel.getByName(TenTL)
+        if(exist) throw createHttpError('Trùng tên thể loại', 409)
 
         const insertId = await CategoryModel.create({ TenTL, MoTa })
         return await CategoryModel.getById(insertId)
@@ -58,6 +63,9 @@ const CategoryService = {
         if (!TenTL || TenTL.trim() === '') {
             throw new Error('Tên thể loại là bắt buộc')
         }
+
+        const existOther = await CategoryModel.getOtherByName(TenTL, exist.MaTL)
+        if(existOther) throw createHttpError('Trùng tên thể loại', 409)
 
         const success = await CategoryModel.update(id, { TenTL, MoTa })
         if (!success) throw new Error('Cập nhật thất bại')

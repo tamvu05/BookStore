@@ -34,6 +34,11 @@ const CategoryModel = {
     async getByName(TenTL) {
         const [rows] = await pool.query('SELECT * FROM TheLoai WHERE TenTL like ?', [TenTL])
         return rows[0] || null
+    },
+
+    async getOtherByName(TenTL, MaTL) {
+        const [rows] = await pool.query('SELECT * FROM TheLoai WHERE TenTL like ? and MaTL <> ?', [TenTL, MaTL])
+        return rows[0] || null
     }
 }
 
