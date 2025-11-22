@@ -44,6 +44,7 @@ const CategoryController = {
                 currentPage: data.currentPage,
                 totalPage: data.totalPage,
                 totalItem: data.categories.length,
+                PAGE_LIMIT: data.PAGE_LIMIT,
                 entityName: 'thể loại',
                 tablePartial: 'partials/category/tableCategory',
                 modalAddSelector: '#add-category-modal',
@@ -81,6 +82,7 @@ const CategoryController = {
                     currentPage: data.currentPage,
                     totalPage: data.totalPage,
                     totalItem: data.categories.length,
+                    PAGE_LIMIT: data.PAGE_LIMIT,
                 }
             )
 

@@ -43,8 +43,13 @@ if (btnAddCategory) {
                         `Lỗi HTTP ${res.status}: Thao tác thất bại.`
                 )
 
-            const dataAttributeElement = tableWrapper.querySelector('#data-attribute')
-            const targetPage = dataAttributeElement.dataset.totalPage
+            const dataAttributeElement =
+                tableWrapper.querySelector('#data-attribute')
+            const pageLimit = dataAttributeElement.dataset.pageLimit
+            const totalItem = dataAttributeElement.dataset.totalItem
+            const currentPage = dataAttributeElement.dataset.currentPage
+            let targetPage = totalItem < pageLimit ? currentPage : Number(currentPage) + 1
+            console.log(targetPage);
 
             updateView(targetPage)
             showToast('Đã thêm thể loại', 'success')
@@ -129,10 +134,11 @@ async function deleteCategory(btnDelete) {
                 )
 
             const dataAttributeElement = tableWrapper.querySelector('#data-attribute')
-            let newPage = dataAttributeElement.dataset.currentPage
-            if (dataAttributeElement.dataset.totalItem < 2) newPage -= 1
+            let targetPage = dataAttributeElement.dataset.currentPage
 
-            updateView(newPage)
+            if (dataAttributeElement.dataset.totalItem < 2) targetPage -= 1
+
+            updateView(targetPage)
             showToast('Đã xóa thể loại', 'success')
         } catch (error) {
             console.log(error)
@@ -213,7 +219,8 @@ if (btnUpdate) {
                         `Lỗi HTTP ${res.status}: Thao tác thất bại.`
                 )
 
-            const dataAttributeElement = tableWrapper.querySelector('#data-attribute')
+            const dataAttributeElement =
+                tableWrapper.querySelector('#data-attribute')
             updateView(dataAttributeElement.dataset.currentPage)
             showToast('Đã cập nhật thể loại', 'success')
 

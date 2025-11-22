@@ -2,8 +2,8 @@ import pool from '../configs/db.js'
 import CategoryModel from '../models/category.model.js'
 import BookModel from '../models/book.model.js'
 import { createHttpError } from '../utils/errorUtil.js'
-
-const LIMIT = 5
+import config from '../configs/app.config.js'
+const {PAGE_LIMIT} = config
 
 const CategoryService = {
     // Lấy tất cả thể loại (Dùng cho cả User và Admin)
@@ -18,24 +18,10 @@ const CategoryService = {
         }
     },
 
-    // // Lấy chi tiết 1 thể loại
-    // async getById(id) {
-    //     try {
-    //         const [rows] = await pool.query(
-    //             'SELECT * FROM TheLoai WHERE MaTL = ?',
-    //             [id]
-    //         )
-    //         return rows[0]
-    //     } catch (error) {
-    //         console.error('❌ Lỗi lấy chi tiết thể loại:', error)
-    //         return null
-    //     }
-    // },
-
     // Truyền page nếu cần phân trang, không truyền thì lấy tất cả
     async getWithPage(page) {
         let currentPage = Number(page)
-        let limit = Number(LIMIT)
+        let limit = Number(PAGE_LIMIT)
 
         if (isNaN(limit) || limit < 2 || limit > 20) limit = 10
 
@@ -54,6 +40,7 @@ const CategoryService = {
             limit,
             totalPage,
             total,
+            PAGE_LIMIT,
         }
     },
 
