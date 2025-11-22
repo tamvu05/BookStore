@@ -1,0 +1,88 @@
+<div class="container py-5">
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8 text-center">
+            <h2 class="fw-bold text-primary mb-2">📂 Khám Phá Theo Chủ Đề</h2>
+            <p class="text-muted mb-4">Tìm kiếm cuốn sách yêu thích của bạn trong kho tàng tri thức</p>
+            
+            <div class="position-relative mx-auto" style="max-width: 500px;">
+                <input type="text" id="categorySearch" class="form-control rounded-pill py-2 px-4 border-primary border-opacity-25 shadow-sm" 
+                       placeholder="Gõ tên thể loại để tìm nhanh... (VD: Kinh tế)">
+                <span class="position-absolute top-50 end-0 translate-middle-y me-3 text-primary">
+                    <i class="bi bi-search"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3" id="categoryList">
+        <% if (categories && categories.length > 0) { %>
+            <% categories.forEach((cat, index) => { %>
+                <div class="col category-item">
+                    <a href="/book?categoryId=<%= cat.MaTL %>" class="text-decoration-none text-dark">
+                        <div class="card h-100 border-0 shadow-sm hover-card p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0
+                                    <%= index % 4 === 0 ? 'bg-primary bg-opacity-10 text-primary' : 
+                                       (index % 4 === 1 ? 'bg-success bg-opacity-10 text-success' : 
+                                       (index % 4 === 2 ? 'bg-warning bg-opacity-10 text-warning' : 'bg-danger bg-opacity-10 text-danger')) %>" 
+                                    style="width: 45px; height: 45px; font-size: 1.2rem;">
+                                    
+                                    <% if (cat.TenTL.toLowerCase().includes('tiểu thuyết')) { %>
+                                        <i class="bi bi-book"></i>
+                                    <% } else if (cat.TenTL.toLowerCase().includes('kinh tế')) { %>
+                                        <i class="bi bi-graph-up-arrow"></i>
+                                    <% } else if (cat.TenTL.toLowerCase().includes('kỹ năng')) { %>
+                                        <i class="bi bi-lightning-charge"></i>
+                                    <% } else { %>
+                                        <i class="bi bi-bookmarks"></i>
+                                    <% } %>
+                                </div>
+
+                                <div class="flex-grow-1 overflow-hidden">
+                                    <h6 class="fw-bold mb-0 text-truncate category-name"><%= cat.TenTL %></h6>
+                                    <small class="text-muted d-block text-truncate" style="font-size: 0.75rem;">
+                                        <%= cat.MoTa || 'Xem ngay' %>
+                                    </small>
+                                </div>
+                                
+                                <i class="bi bi-chevron-right text-muted opacity-25 ms-2 small arrow-icon"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">Chưa có dữ liệu thể loại.</p>
+            </div>
+        <% } %>
+    </div>
+    
+    <div id="noResult" class="text-center py-5 d-none">
+        <i class="bi bi-search display-4 text-muted opacity-25"></i>
+        <p class="text-muted mt-2">Không tìm thấy thể loại nào phù hợp.</p>
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: all 0.2s ease;
+        background: white;
+        border: 1px solid #f0f0f0 !important;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-3px);
+        border-color: #0d6efd !important;
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.1) !important;
+    }
+
+    .hover-card:hover .arrow-icon {
+        transform: translateX(5px);
+        color: #0d6efd !important;
+        opacity: 1 !important;
+        transition: 0.3s;
+    }
+</style>
+
+<script src="/js/category.user.js"></script>
