@@ -1,12 +1,12 @@
+import dotenv from 'dotenv'
+dotenv.config()
+
 import express from 'express'
 import morgan from 'morgan'
 import compression from 'compression'
 import router from './routers/index.js'
-import dotenv from 'dotenv'
 import path from 'path'
 import expressEjsLayouts from 'express-ejs-layouts'
-
-dotenv.config()
 const app = express()
 const __dirname = import.meta.dirname
 
