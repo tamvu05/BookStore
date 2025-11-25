@@ -138,10 +138,11 @@ const AuthorController = {
         }
     },
 
-    // /api/category/export
+    // /api/author/export
     async export(req, res, next) {
         try {
             const authors = await AuthorService.getAll()
+            console.log(authors);
             const excelData = authors.map((data) => {
                 return {
                     'Tên tác giả': data.TenTG,

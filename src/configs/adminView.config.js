@@ -24,4 +24,17 @@ const authorConfig = {
     modalUpdateId: 'update-author-modal',
 }
 
-export { categoryConfig, authorConfig }
+const publisherConfig = {
+    scripts: ['/js/publisher.admin.js'],
+    entityName: 'nhà xuất bản',
+    tablePartial: 'partials/publisher/tablePublisher',
+    modalAddPartial: 'partials/publisher/modalAddPublisher',
+    modalUpdatePartial: 'partials/publisher/modalUpdatePublisher',
+    hrefBase: '/admin/publisher/',
+    apiBase: '/api/publisher',
+    modalAddSelector: '#add-publisher-modal',
+    modalAddId: 'add-publisher-modal',
+    modalUpdateId: 'update-publisher-modal',
+}
+
+export { categoryConfig, authorConfig, publisherConfig }

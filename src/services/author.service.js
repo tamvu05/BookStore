@@ -1,10 +1,14 @@
 import AuthorModel from '../models/author.model.js'
+import BookModel from '../models/book.model.js'
 import config from '../configs/app.config.js'
+import { createHttpError } from '../utils/errorUtil.js'
 const {PAGE_LIMIT} = config
 
 const AuthorService = {
     async getAll() {
-        return await AuthorModel.getAll()
+        const authors = await AuthorModel.getAll()
+        console.log(authors);
+        return authors
     },
 
     async getById(id) {
@@ -53,6 +57,9 @@ const AuthorService = {
         const exist = await AuthorModel.getById(id)
         if (!exist) throw new Error('Tác giả không tồn tại')
 
+        const bookCount = await BookModel.countByAuthor(id)
+        if(bookCount > 0) throw createHttpError('Không thể xóa tác giả vì đang có sách tham chiếu', 409)
+
         const success = await AuthorModel.delete(id)
         if (!success) throw new Error('Xóa thất bại')
 
@@ -81,7 +88,6 @@ const AuthorService = {
         const sortOrder = validParam.includes(order) ? order : 'DESC'
         
         const authors = await AuthorModel.getWithParam(limit, offset, sortBy, sortOrder)
-        // const totalItem = await AuthorModel.getTotal()
 
         return {
             authors,
@@ -89,7 +95,7 @@ const AuthorService = {
             limit,
             totalPage,
             total,
-            totalItem: total,
+            totalItem: total,  
             PAGE_LIMIT,
         }
     },

@@ -54,7 +54,17 @@ const BookModel = {
     async countByCategory(MaTL) {
         const [result] = await pool.query('SELECT COUNT(*) AS bookCount FROM Sach WHERE MaTL = ?', [MaTL])
         return result[0].bookCount
-    }
+    },
+
+    async countByAuthor(MaTG) {
+        const [result] = await pool.query('SELECT COUNT(*) AS bookCount FROM Sach WHERE MaTG = ?', [MaTG])
+        return result[0].bookCount
+    },
+
+    async countByPublisher(MaNXB) {
+        const [result] = await pool.query('SELECT COUNT(*) AS bookCount FROM Sach WHERE MaNXB = ?', [MaNXB])
+        return result[0].bookCount
+    },
 }
 
 export default BookModel

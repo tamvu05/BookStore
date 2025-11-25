@@ -42,7 +42,6 @@ const CategoryService = {
         
 
         const categories = await CategoryModel.getWithParam(limit, offset, sortBy, sortOrder)
-        const totalItem = await CategoryModel.getTotal()
 
         return {
             categories,
@@ -50,7 +49,7 @@ const CategoryService = {
             limit,
             totalPage,
             total,
-            totalItem,
+            totalItem: total,      // DƯ
             PAGE_LIMIT,
         }
     },

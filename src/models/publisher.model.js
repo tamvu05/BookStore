@@ -6,8 +6,39 @@ const PublisherBanModel = {
         return rows
     },
 
+    async getWithParam(limit, offset, sortBy = 'MaNXB', sortOrder = 'DESC') {
+        const [rows] = await pool.query(
+            `SELECT * FROM NhaXuatBan ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
+            [limit, offset]
+        )
+        return rows
+    },
+
     async getById(id) {
         const [rows] = await pool.query('SELECT * FROM NhaXuatBan WHERE MaNXB = ?', [id])
+        return rows[0] || null
+    },
+
+    async getTotal() {
+        const [result] = await pool.query(
+            'SELECT COUNT(*) AS total FROM NhaXuatBan'
+        )
+        return result[0].total
+    },
+
+    async getByName(TenNXB) {
+        const [rows] = await pool.query(
+            'SELECT * FROM NhaXuatBan WHERE TenNXB like ?',
+            [TenNXB]
+        )
+        return rows[0] || null
+    },
+
+    async getOtherByName(TenNXB, MaNXB) {
+        const [rows] = await pool.query(
+            'SELECT * FROM NhaXuatBan WHERE TenNXB like ? and MaNXB <> ?',
+            [TenNXB, MaNXB]
+        )
         return rows[0] || null
     },
 

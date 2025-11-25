@@ -1,0 +1,32 @@
+<!-- Modal Update -->
+<div class="modal fade" id="<%= modalUpdateId %>" tabindex="-1" aria-labelledby="<%= modalUpdateId %>-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="<%= modalUpdateId %>-label">Chỉnh sửa thông tin nhà xuất bản</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>      
+            <div class="modal-body">
+                <form autocomplete="off">
+                    <div class="mb-3">
+                        <label for="entity-name-input" class="form-label" data-id="">Tên nhà xuất bản</label>
+                        <input type="text" class="form-control" id="entity-name-input">
+                        <div class="invalid-value empty-name">Vui lòng nhập tên nhà xuất bản!</div>
+                        <div class="invalid-value not-unique-name">Trùng tên nhà xuất bản!</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="entity-desc-input" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="entity-desc-input" rows="4"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                
+                <button type="button" class="btn btn-primary btn-save-entity">
+                    <i class="fas fa-save me-2"></i>Lưu lại
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

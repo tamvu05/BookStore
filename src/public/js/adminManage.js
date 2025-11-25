@@ -66,7 +66,7 @@ export function initializeManager(config) {
                 const modalInstance = bootstrap.Modal.getInstance(addModal)
                 modalInstance.hide()
             } catch (error) {
-                if (error.message.includes(`Trùng tên ${entityName}`)) {
+                if (error.message.includes(`Trùng tên`)) {
                     notUniqueAddModal.classList.add('active')
                     return
                 }
@@ -183,7 +183,7 @@ export function initializeManager(config) {
                     modalInstance.hide()
                 }
             } catch (error) {
-                if (error.message === 'Trùng tên thể loại') {
+                if (error.message.includes('Trùng tên')) {
                     notUniqueUpdateModal.classList.add('active')
                     return
                 }

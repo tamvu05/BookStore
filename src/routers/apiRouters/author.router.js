@@ -5,6 +5,8 @@ const router = express.Router()
 
 router.get('/partials', AuthorController.getPartials)
 
+router.get('/export', AuthorController.export)
+
 router.get('/:id', AuthorController.getById)
 
 router.post('/', AuthorController.create)
