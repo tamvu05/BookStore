@@ -1,8 +1,8 @@
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold text-primary mb-1">Đơn hàng #<%= order.MaPX %></h3>
-            <span class="text-muted small">Ngày đặt: <%= new Date(order.NgayXuat).toLocaleDateString('vi-VN') %></span>
+            <h3 class="fw-bold text-primary mb-1">Đơn hàng #<%= order.MaDH %></h3>
+            <span class="text-muted small">Ngày đặt: <%= new Date(order.NgayDat).toLocaleDateString('vi-VN') %></span>
         </div>
         
         <div>
@@ -55,7 +55,7 @@
                                         <small class="text-muted">x<%= item.SoLuong %></small>
                                     </td>
                                     <td class="text-end pe-4 fw-bold">
-                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.DonGiaXuat) %>
+                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.DonGia) %>
                                     </td>
                                 </tr>
                             <% }) %>

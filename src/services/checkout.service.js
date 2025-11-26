@@ -6,9 +6,7 @@ const CheckoutService = {
     async placeOrder(customerId, orderInfo) {
         let connection;
         try {
-            // 👇 SỬA DÒNG NÀY: Thêm 'nguoiNhan' vào danh sách lấy ra
             const { nguoiNhan, diaChi, sdt, ghiChu } = orderInfo;
-            // -----------------------------------------------------
 
             // 1. Lấy thông tin giỏ hàng hiện tại
             const cartData = await CartService.getCartDetails(customerId);
@@ -19,9 +17,8 @@ const CheckoutService = {
             await connection.beginTransaction();
 
             // 3. Tạo Đơn hàng (PhieuXuat)
-            // Lưu ý: Thứ tự biến trong mảng [] phải khớp với dấu ? trong câu SQL
             const [orderResult] = await connection.query(
-                `INSERT INTO PhieuXuat (MaKH, NgayXuat, TongTien, TenNguoiNhan, DiaChiNhan, SDT, MucDich, TrangThai) 
+                `INSERT INTO DonHang (MaKH, NgayDat, TongTien, TenNguoiNhan, DiaChiNhan, SDT, MucDich, TrangThai) 
                  VALUES (?, NOW(), ?, ?, ?, ?, ?, 'CHO_XAC_NHAN')`,
                 [customerId, cartData.grandTotal, nguoiNhan, diaChi, sdt, ghiChu || 'Mua online']
             );
@@ -30,7 +27,7 @@ const CheckoutService = {
             // 4. Chép từng cuốn sách từ Giỏ hàng sang Chi tiết đơn hàng (CTPhieuXuat)
             for (const item of cartData.items) {
                 await connection.query(
-                    `INSERT INTO CTPhieuXuat (MaPX, MaSach, SoLuong, DonGiaXuat) 
+                    `INSERT INTO CTDonHang (MaDH, MaSach, SoLuong, DonGia) 
                      VALUES (?, ?, ?, ?)`,
                     [orderId, item.MaSach, item.SoLuong, item.DonGia]
                 );

@@ -6,9 +6,9 @@ const OrderService = {
         try {
             // Sắp xếp ngày giảm dần (Đơn mới nhất lên đầu)
             const query = `
-                SELECT * FROM PhieuXuat 
+                SELECT * FROM DonHang 
                 WHERE MaKH = ? 
-                ORDER BY NgayXuat DESC
+                ORDER BY NgayDat DESC
             `;
             const [orders] = await pool.query(query, [customerId]);
             return orders;
@@ -22,7 +22,7 @@ const OrderService = {
     async getOrderDetail(orderId) {
         try {
             // 1. Lấy thông tin chung của đơn hàng
-            const [orders] = await pool.query('SELECT * FROM PhieuXuat WHERE MaPX = ?', [orderId]);
+            const [orders] = await pool.query('SELECT * FROM DonHang WHERE MaDH = ?', [orderId]);
             const order = orders[0];
             
             if (!order) return null;
@@ -30,9 +30,9 @@ const OrderService = {
             // 2. Lấy danh sách sách trong đơn đó (JOIN với bảng Sach để lấy Tên và Ảnh)
             const queryItems = `
                 SELECT ct.*, s.TenSach, s.HinhAnh
-                FROM CTPhieuXuat ct
+                FROM CTDonHang ct
                 JOIN Sach s ON ct.MaSach = s.MaSach
-                WHERE ct.MaPX = ?
+                WHERE ct.MaDH = ?
             `;
             const [items] = await pool.query(queryItems, [orderId]);
 

@@ -18,8 +18,8 @@
                     <% if (orders && orders.length > 0) { %>
                         <% orders.forEach(order => { %>
                             <tr>
-                                <td class="ps-4 fw-bold text-primary">#<%= order.MaPX %></td>
-                                <td><%= new Date(order.NgayXuat).toLocaleDateString('vi-VN') %></td>
+                                <td class="ps-4 fw-bold text-primary">#<%= order.MaDH %></td>
+                                <td><%= new Date(order.NgayDat).toLocaleDateString('vi-VN') %></td>
                                 <td>
                                     <div class="fw-bold text-dark"><%= order.TenNguoiNhan %></div>
                                     <div class="small"><%= order.DiaChiNhan %></div>
@@ -40,7 +40,7 @@
                                     <% } %>
                                 </td>
                                 <td class="text-end pe-4">
-                                    <a href="/order/detail/<%= order.MaPX %>" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <a href="/order/detail/<%= order.MaDH %>" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                         Xem
                                     </a>
                                 </td>
