@@ -47,14 +47,11 @@ body {
 }
 
 /* Ảnh Banner */
-.hero-img-style {
-    border-radius: 20px; /* Bo góc nhỏ lại xíu cho hợp tỉ lệ */
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-    transition: transform 0.5s ease;
-}
-
-.hero-img-style:hover {
-    transform: translateY(-5px) scale(1.01);
+.banner-slide-img {
+    height: 380px;       /* Chiều cao cố định để slide không bị giật */
+    object-fit: cover;   /* Cắt ảnh cho vừa khung mà không méo */
+    object-position: center;
+    border-radius: 20px; /* Bo tròn cho mềm mại */
 }
 
 /* Hiệu ứng nút bấm */
