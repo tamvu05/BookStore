@@ -26,19 +26,17 @@ const AuthorModel = {
         return result.affectedRows > 0
     },
 
-    async getWithParam(limit, offset, sortBy = 'MaTG', sortOrder = 'DESC', keyword = '') {
-        const searchKeyword = `%${keyword}%`
+    async getWithParam(limit, offset, sortBy = 'MaTG', sortOrder = 'DESC') {
         const [rows] = await pool.query(
-            `SELECT * FROM TacGia WHERE TenTG LIKE ? ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
-            [searchKeyword, limit, offset]
+            `SELECT * FROM TacGia ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
+            [limit, offset]
         )
         return rows
     },
 
-    async getTotal(keyword = '') {
-        const searchKeyword = `%${keyword}%`
+    async getTotal() {
         const [result] = await pool.query(
-            'SELECT COUNT(*) AS total FROM TacGia WHERE TenTG LIKE ?', [searchKeyword]
+            'SELECT COUNT(*) AS total FROM TacGia'
         )
         return result[0].total
     },

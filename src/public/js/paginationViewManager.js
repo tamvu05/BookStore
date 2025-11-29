@@ -1,13 +1,13 @@
 import showToast from './toast.js'
 
-const paginationWrapper = document.querySelector('#pagination-view-manager')
-if (paginationWrapper) {
+const paginationZone = document.querySelector('#pagination-view-manager')
+if (paginationZone) {
     const tableWrapper = document.querySelector('#table-view-manager')
-    const apiBaseElement = paginationWrapper.querySelector('#attribute-api-base')
+    const apiBaseElement = paginationZone.querySelector('#attribute-api-base')
     let apiBase
     if (apiBaseElement) apiBase = apiBaseElement.dataset.apiBase
 
-    paginationWrapper.addEventListener('click', (event) => {
+    paginationZone.addEventListener('click', (event) => {
         const btn = event.target.closest('a.page-link')
 
         if (btn && btn.hasAttribute('href')) {
@@ -17,35 +17,22 @@ if (paginationWrapper) {
             const url = new URL(href, window.location.origin)
             const newPage = url.searchParams.get('page')
 
-            const sortableHeader = tableWrapper.querySelector(
-                'tr i.sortable[data-order]'
-            )
-            let sort = null,
-                order = null
-            if (sortableHeader) {
-                sort = sortableHeader.dataset.sort
-                order = sortableHeader.dataset.order
-            }
-
-            const inputSearch = document.querySelector(
-                '.manager-container .search-value'
-            )
-            let keyword = null
-            if (inputSearch.value.trim() !== '') keyword = inputSearch.value.trim()
-
-            updateView(newPage, sort, order, keyword)
+            updateView(newPage)
         }
     })
 
     // Hàm cập nhật view
-    async function updateView(page = 1, sort, order, keyword) {
+    async function updateView(page = 1) {
         try {
-            if (isNaN(page) || Number(page) < 1) page = 1
-
+            const sortableHeader = tableWrapper.querySelector(
+                'tr i.sortable[data-order]'
+            )
             let query = `page=${page}`
-            if (sort) query += `&sort=${sort}`
-            if (order) query += `&order=${order}`
-            if (keyword) query += `&keyword=${keyword}`
+            if (sortableHeader) {
+                const sort = sortableHeader.dataset.sort
+                const order = sortableHeader.dataset.order
+                query += `&sort=${sort}&order=${order}`
+            }
 
             const res = await fetch(`${apiBase}/partials?${query}`)
             const data = await res.json()
@@ -56,27 +43,32 @@ if (paginationWrapper) {
                 )
             }
 
-            if (tableWrapper) tableWrapper.innerHTML = data.table
-            if (paginationWrapper) paginationWrapper.innerHTML = data.pagination
+            const paginationElement = document.querySelector(
+                '#pagination-view-manager'
+            )
 
-            updateSortIcon(sort, order)
+            tableWrapper.innerHTML = data.table
+            paginationElement.innerHTML = data.pagination
+            if (sortableHeader) {
+                const sort = sortableHeader.dataset.sort
+                const order = sortableHeader.dataset.order
+                console.log(sort, order)
+                updateSortIcon(sort, order)
+            }
 
-            //Cập nhật lại URL trình duyệt mà kh reload trang
-            const currentUrl = new URL(window.location.href)
-            currentUrl.search = ''
-            currentUrl.searchParams.set('page', page)
-            if (sort) currentUrl.searchParams.set('sort', sort)
-            if (order) currentUrl.searchParams.set('order', order)
-            if (keyword) currentUrl.searchParams.set('keyword', keyword)
-
-            history.pushState(null, '', currentUrl.toString())
+            // Cập nhật lại URL trình duyệt mà kh reload trang
+            // const currentUrl = new URL(window.location.href)
+            // currentUrl.searchParams.set('page', page)
+            // history.pushState(null, '', currentUrl.toString())
         } catch (error) {
-            showToast(error.message, 'danger')
+            showToast('Lỗi cập nhật view', 'danger')
         }
     }
 
     // Update sort icon
     function updateSortIcon(sortKey, sortOrder) {
+        console.log(sortKey, sortOrder)
+
         const sortableHeaders = tableWrapper.querySelectorAll('tr i.sortable')
         sortableHeaders.forEach((h) => {
             if (h.dataset.sort === sortKey) {

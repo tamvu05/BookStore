@@ -1,10 +1,9 @@
 import pool from '../configs/db.js'
 
 const CategoryModel = {
-    async getTotal(keyword = '') {
-        const searchKeyword = `%${keyword}%`
+    async getTotal() {
         const [result] = await pool.query(
-            'SELECT COUNT(*) AS total FROM TheLoai WHERE TenTL LIKE ?', [searchKeyword]
+            'SELECT COUNT(*) AS total FROM TheLoai'
         )
         return result[0].total
     },
@@ -14,11 +13,10 @@ const CategoryModel = {
         return rows
     },
 
-    async getWithParam(limit, offset, sortBy = 'MaTL', sortOrder = 'DESC', keyword = '') {
-        const searchKeyword = `%${keyword}%`
+    async getWithParam(limit, offset, sortBy = 'MaTL', sortOrder = 'DESC') {
         const [rows] = await pool.query(
-            `SELECT * FROM TheLoai WHERE TenTL LIKE ? ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
-            [searchKeyword, limit, offset]
+            `SELECT * FROM TheLoai ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
+            [limit, offset]
         )
         return rows
     },

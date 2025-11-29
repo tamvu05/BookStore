@@ -52,6 +52,7 @@ const PublisherController = {
         }
 
         try {
+            console.log(123);
             const query = req.query
             const data = await PublisherService.getWithParam(query)
             const table = await renderPartial(

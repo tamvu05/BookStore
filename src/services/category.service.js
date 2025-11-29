@@ -3,7 +3,7 @@ import CategoryModel from '../models/category.model.js'
 import BookModel from '../models/book.model.js'
 import { createHttpError } from '../utils/errorUtil.js'
 import config from '../configs/app.config.js'
-const { PAGE_LIMIT } = config
+const {PAGE_LIMIT} = config
 
 const CategoryService = {
     // Lấy tất cả thể loại (Dùng cho cả User và Admin)
@@ -20,16 +20,14 @@ const CategoryService = {
 
     // Truyền page nếu cần phân trang, không truyền thì lấy tất cả
     async getWithParam(query) {
-        let { page, sort, order, keyword } = query
+        const {page, sort, order} = query
 
         let currentPage = Number(page)
         let limit = Number(PAGE_LIMIT)
 
         if (isNaN(limit) || limit < 2 || limit > 20) limit = 10
 
-        if (!keyword) keyword = ''
-
-        const total = await CategoryModel.getTotal(keyword)
+        const total = await CategoryModel.getTotal()
         const totalPage = Math.ceil(total / limit)
 
         if (isNaN(currentPage) || currentPage > totalPage) currentPage = 1
@@ -37,26 +35,13 @@ const CategoryService = {
 
         const offset = (currentPage - 1) * limit
 
-        const validParam = [
-            'MaTL',
-            'TenTL',
-            'MoTa',
-            'ASC',
-            'asc',
-            'DESC',
-            'desc',
-        ]
+        const validParam = ['MaTL', 'TenTL', 'MoTa', 'ASC', 'asc', 'DESC', 'desc']
 
         const sortBy = validParam.includes(sort) ? sort : 'MaTL'
         const sortOrder = validParam.includes(order) ? order : 'DESC'
+        
 
-        const categories = await CategoryModel.getWithParam(
-            limit,
-            offset,
-            sortBy,
-            sortOrder,
-            keyword
-        )
+        const categories = await CategoryModel.getWithParam(limit, offset, sortBy, sortOrder)
 
         return {
             categories,
@@ -64,7 +49,7 @@ const CategoryService = {
             limit,
             totalPage,
             total,
-            totalItem: total, // DƯ
+            totalItem: total,      // DƯ
             PAGE_LIMIT,
         }
     },
@@ -121,10 +106,7 @@ const CategoryService = {
 
         const bookCount = await BookModel.countByCategory(id)
         if (bookCount > 0)
-            throw createHttpError(
-                'Không thể xóa thể loại vì đang có sách tham chiếu',
-                409
-            )
+            throw createHttpError('Không thể xóa thể loại vì đang có sách tham chiếu', 409)
 
         const success = await CategoryModel.delete(id)
         if (!success) throw new Error('Xóa thất bại')

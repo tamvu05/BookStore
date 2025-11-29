@@ -53,7 +53,6 @@ const AuthorController = {
         try {
             const query = req.query
             const data = await AuthorService.getWithParam(query)
-            console.log(data);
             const table = await renderPartial(
                 'admin/partials/author/tableAuthor',
                 {

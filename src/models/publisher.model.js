@@ -6,11 +6,10 @@ const PublisherBanModel = {
         return rows
     },
 
-    async getWithParam(limit, offset, sortBy = 'MaNXB', sortOrder = 'DESC', keyword = '') {
-        const searchKeyword = `%${keyword}%`
+    async getWithParam(limit, offset, sortBy = 'MaNXB', sortOrder = 'DESC') {
         const [rows] = await pool.query(
-            `SELECT * FROM NhaXuatBan WHERE TenNXB LIKE ? ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
-            [searchKeyword, limit, offset]
+            `SELECT * FROM NhaXuatBan ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
+            [limit, offset]
         )
         return rows
     },
@@ -20,10 +19,9 @@ const PublisherBanModel = {
         return rows[0] || null
     },
 
-    async getTotal(keyword = '') {
-        const searchKeyword = `%${keyword}%`
+    async getTotal() {
         const [result] = await pool.query(
-            'SELECT COUNT(*) AS total FROM NhaXuatBan WHERE TenNXB LIKE ?', [searchKeyword]
+            'SELECT COUNT(*) AS total FROM NhaXuatBan'
         )
         return result[0].total
     },
