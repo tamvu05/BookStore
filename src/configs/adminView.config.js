@@ -42,7 +42,7 @@ const bookConfig = {
     entityName: 'sách',
     tablePartial: 'partials/book/tableBook',
     modalAddPartial: 'partials/book/modalAddBook',
-    modalUpdatePartial: 'partials/book/modalUpdateBook',
+    // modalUpdatePartial: 'partials/book/modalUpdateBook',
     hrefBase: '/admin/book/',
     apiBase: '/api/book',
     modalAddSelector: '#add-book-modal',
@@ -63,4 +63,17 @@ const supplierConfig = {
     modalUpdateId: 'update-supplier-modal',
 }
 
-export { categoryConfig, authorConfig, publisherConfig, bookConfig, supplierConfig }
+const importReceiptConfig = {
+    scripts: ['/js/importReceipt.admin.js'],
+    entityName: 'phiếu nhập',
+    tablePartial: 'partials/importReceipt/tableImportReceipt',
+    modalAddPartial: 'partials/importReceipt/modalImportReceipt',
+    // modalUpdatePartial: 'partials/importReceipt/modalUpdateImportReceipt',
+    hrefBase: '/admin/import-receipt/',
+    apiBase: '/api/import-receipt',
+    modalAddSelector: '#add-importReceipt-modal',
+    modalAddId: 'add-importReceipt-modal',
+    modalUpdateId: 'update-importReceipt-modal',
+}
+
+export { categoryConfig, authorConfig, publisherConfig, bookConfig, supplierConfig, importReceiptConfig }

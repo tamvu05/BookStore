@@ -4,6 +4,7 @@ import AuthorController from '../../controllers/author.controller.js'
 import PublisherController from '../../controllers/publisher.controller.js'
 import BookController from '../../controllers/book.controller.js'
 import SupplierController from '../../controllers/supplier.controller.js'
+import ImportReceiptController from '../../controllers/importReceipt.controller.js'
 
 const router = express.Router()
 
@@ -12,6 +13,7 @@ router.get('/author', AuthorController.getViewManager)
 router.get('/publisher', PublisherController.getViewManager)
 router.get('/book', BookController.getViewManager)
 router.get('/supplier', SupplierController.getViewManager)
+router.get('/import-receipt', ImportReceiptController.getViewManager)
 
 
 router.get('/', (req, res, next) => {

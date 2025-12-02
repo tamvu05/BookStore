@@ -4,6 +4,7 @@ import categoryRouter from './category.router.js'
 import publisherRouter from './publisher.router.js'
 import bookRouter from './book.router.js'
 import supplierRouter from './supplier.router.js'
+import importReceiptRouter from './importReceipt.routerr.js'
 
 
 const router = express.Router()
@@ -13,5 +14,6 @@ router.use('/category', categoryRouter)
 router.use('/publisher', publisherRouter)
 router.use('/book', bookRouter)
 router.use('/supplier', supplierRouter)
+router.use('/import-receipt', importReceiptRouter)
 
 export default router

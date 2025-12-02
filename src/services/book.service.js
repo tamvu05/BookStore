@@ -85,6 +85,11 @@ const BookService = {
         }
     },
 
+    // Lấy hết không điều kiện
+    async getAllJSON() {
+        return BookModel.getAll()
+    },
+
     // Hàm lấy chi tiết 1 cuốn sách (JOIN đầy đủ thông tin)
     async getById(id) {
         try {

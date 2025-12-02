@@ -1,0 +1,203 @@
+<!-- Modal tạo phiếu nhập -->
+<div class="modal fade" id="<%= modalAddId %>" tabindex="-1" aria-labelledby="<%= modalAddId %>-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="<%= modalAddId %>-label">Tạo phiếu nhập hàng</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form autocomplete="off" id="import-receipt-form">
+                    
+                    <div class="row mb-4" id="input-for-add-receipt">
+                        <div class="col-lg-5">
+                            <h5 class="mb-3 text-primary">Thông tin phiếu nhập</h5>
+                            
+                            <div class="mb-3">
+                                <label for="supplier-select" class="form-label">Nhà cung cấp <span class="text-danger">*</span></label>
+                                <div><select class="form-select" id="supplier-select" required>
+                                    <option></option>
+                                    <% suppliers.forEach(supplier => { %>
+                                        <option value="<%= supplier.MaNCC %>"><%= supplier.TenNCC %></option>
+                                    <% }) %>
+                                </select></div>
+                                <div class="value-error d-none empty-supplier">Vui lòng chọn nhà cung cấp!</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="receipt-date-input" class="form-label">Ngày nhập <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="receipt-date-input" value="<%= new Date().toISOString().substring(0, 10) %>" required>
+                                <div class="value-error d-none empty-date">Vui lòng chọn ngày nhập!</div>
+                                <div class="value-error d-none past-date-error"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-7">
+                            <h5 class="mb-3 text-primary">Thêm chi tiết mặt hàng</h5>
+
+                            <div class="card p-3 border-secondary">
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-6">
+                                        <label for="book-select-item" class="form-label mb-0">Sách </label>
+                                        <select class="form-select" id="book-select-item">
+                                            <option value="">Chọn sách</option>
+                                            <% books.forEach(book => { %>
+                                                <option value="<%= book.MaSach %>" data-price="<%= book.DonGia %>">
+                                                    <%= book.TenSach %> (ISBN: <%= book.ISBN %>)
+                                                </option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="col-2">
+                                        <label for="input-quantity" class="form-label mb-0">Số lượng </label>
+                                        <input type="number" class="form-control text-end" id="input-quantity" min="1" value="1">
+                                    </div>
+                                    <div class="col-3">
+                                        <label for="input-unit-price" class="form-label mb-0">Đơn giá </span></label>
+                                        <input type="number" class="form-control text-end" id="input-unit-price" min="0" value="0" step="1000">
+                                    </div>
+                                    <div class="col-1 d-flex justify-content-end">
+                                        <button type="button" class="btn btn-success btn-add-item" title="Thêm mặt hàng">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="value-error d-none item-input-error mt-2">Vui lòng chọn sách, nhập số lượng và đơn giá!</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3 text-primary">Danh sách mặt hàng đã nhập</h5>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm" id="receipt-items-table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Sách</th>
+                                            <th style="width: 15%;">Số lượng</th>
+                                            <th style="width: 20%;">Đơn giá (VND)</th>
+                                            <th style="width: 10%;" class="text-center">Xóa</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="receipt-items-body">
+                                        </tbody>
+                                    <tfoot>
+                                        <tr class="table-primary">
+                                            <th colspan="2" class="text-end">Tổng tiền</th>
+                                            <th id="receipt-total-amount" colspan="2" class="text-end total-amount">0 VND</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                <div class="value-error d-none items-error">Vui lòng thêm ít nhất một mặt hàng!</div>
+                                <div class="value-error d-none invalid-item-amount">Vui lòng nhập số lượng và đơn giá hợp lệ (>0) cho tất cả mặt hàng!</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label for="receipt-notes-textarea" class="form-label">Ghi chú/Nội dung</label>
+                                <textarea class="form-control" id="receipt-notes-textarea" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Đóng
+                </button>
+                <button type="button" class="btn btn-primary btn-save-receipt">
+                    <i class="fas fa-file-import me-2"></i>Tạo Phiếu Nhập
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Modal xem chi tiết -->
+ <div class="modal fade" id="view-import-receipt-modal" tabindex="-1" aria-labelledby="view-import-receipt-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="view-import-receipt-modal-label">
+                    Chi tiết phiếu nhập hàng<span id="view-mapn-display"></span>
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row mb-4">
+                    <div class="col-lg-5">
+                        <h5 class="mb-3 text-primary">Thông tin phiếu nhập</h5>
+                        <p><strong>Ngày nhập:</strong> <span id="view-ngaynhap"></span></p>
+                        <p><strong>Nhà cung cấp:</strong> <span id="view-ncc-ten"></span></p>
+                        <p><strong>Nhân viên lập phiếu:</strong> <span id="view-nv-ten"></span></p>
+                    </div>
+
+                    <div class="col-lg-7">
+                        <h5 class="mb-3 text-primary">Ghi chú/Nội dung</h5>
+                        <div class="card p-3 bg-light">
+                            <p id="view-noidung" class="mb-0 text-muted" style="white-space: pre-wrap;"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="mb-3 text-primary mt-3">Danh sách mặt hàng đã nhập</h5>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm" id="view-receipt-items-table">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Sách</th>
+                                        <th style="width: 15%;">SL Nhập</th>
+                                        <th style="width: 20%;">Đơn giá (VND)</th>
+                                        <th style="width: 20%;">Thành tiền (VND)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="view-receipt-items-body">
+                                    
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-primary">
+                                        <th colspan="3" class="text-end">Tổng tiền Phiếu Nhập</th>
+                                        <th id="view-total-amount" class="text-end total-amount"></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .card.p-3.border-secondary {
+        margin-top: 46px;
+    }
+
+    .value-error{
+        color: red;
+    }
+</style>
