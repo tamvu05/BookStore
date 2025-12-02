@@ -38,7 +38,8 @@ const ImportReceiptModel = {
     },
 
     async getById(id) {
-        const [rows] = await pool.query(`
+        const [rows] = await pool.query(
+            `
             SELECT NgayNhap, TenNCC, HoTen, NoiDung
             FROM PhieuNhap pn
             JOIN NhaCungCap ncc on pn.MaNCC = ncc.MaNCC
@@ -50,7 +51,8 @@ const ImportReceiptModel = {
     },
 
     async getDetailById(id) {
-        const [rows] = await pool.query(`
+        const [rows] = await pool.query(
+            `
            SELECT TenSach, SoLuong, DonGiaNhap
             FROM PhieuNhap pn
             JOIN CTPhieuNhap ctpn on pn.MaPN = ctpn.MaPN
@@ -70,21 +72,44 @@ const ImportReceiptModel = {
     // },
 
     async create({ MaNCC, MaNV, NgayNhap, NoiDung, ChiTietPN }) {
-        const [result] = await pool.query(
-            'INSERT INTO PhieuNhap(MaNCC, MaNV, NgayNhap, NoiDung) VALUES (?, ?, ?, ?)',
-            [MaNCC, MaNV, NgayNhap, NoiDung]
-        )
+        const connection = await pool.getConnection()
 
-        const MaPN = result.insertId
+        try {
+            await connection.beginTransaction()
 
-        const detailPromise = ChiTietPN.map(async (chiTiet) => {
-            return pool.query(`INSERT INTO CTPhieuNhap(MaPN, MaSach, SoLuong, DonGiaNhap) VALUES (?, ?, ?, ?)`,
-                [MaPN, chiTiet.MaSach, chiTiet.SoLuong, chiTiet.DonGia])
-        })
+            const [result] = await connection.query(
+                'INSERT INTO PhieuNhap(MaNCC, MaNV, NgayNhap, NoiDung) VALUES (?, ?, ?, ?)',
+                [MaNCC, MaNV, NgayNhap, NoiDung]
+            )
 
-        await Promise.all(detailPromise)
+            const MaPN = result.insertId
 
-        return MaPN
+            const detailPromise = ChiTietPN.map(async (chiTiet) => {
+                const insertCTPromise = connection.query(
+                    `INSERT INTO CTPhieuNhap(MaPN, MaSach, SoLuong, DonGiaNhap) VALUES (?, ?, ?, ?)`,
+                    [MaPN, chiTiet.MaSach, chiTiet.SoLuong, chiTiet.DonGia]
+                )
+
+                const updateSachPromise = connection.query(
+                    'UPDATE Sach SET SoLuongTon = SoLuongTon + ? WHERE MaSach = ?',
+                    [chiTiet.SoLuong, chiTiet.MaSach]
+                )
+
+                await Promise.all([insertCTPromise, updateSachPromise])
+                return true
+            })
+
+            await Promise.all(detailPromise)
+
+            await connection.commit()
+
+            return MaPN
+        } catch (error) {
+            await connection.rollback()
+            throw error 
+        } finally {
+            connection.release()
+        }
     },
 
     // async delete(id) {
