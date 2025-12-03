@@ -76,4 +76,25 @@ const importReceiptConfig = {
     modalUpdateId: 'update-importReceipt-modal',
 }
 
-export { categoryConfig, authorConfig, publisherConfig, bookConfig, supplierConfig, importReceiptConfig }
+const exportReceiptConfig = {
+    scripts: ['/js/exportReceipt.admin.js'],
+    entityName: 'phiếu xuất',
+    tablePartial: 'partials/exportReceipt/tableExportReceipt',
+    modalAddPartial: 'partials/exportReceipt/modalExportReceipt',
+    // modalUpdatePartial: 'partials/exportReceipt/modalUpdateExportReceipt',
+    hrefBase: '/admin/export-receipt/',
+    apiBase: '/api/export-receipt',
+    modalAddSelector: '#add-exportReceipt-modal',
+    modalAddId: 'add-exportReceipt-modal',
+    modalUpdateId: 'update-exportReceipt-modal',
+}
+
+export {
+    categoryConfig,
+    authorConfig,
+    publisherConfig,
+    bookConfig,
+    supplierConfig,
+    importReceiptConfig,
+    exportReceiptConfig,
+}
