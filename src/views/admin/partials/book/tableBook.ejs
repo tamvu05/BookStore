@@ -19,6 +19,8 @@
                 <th>Tác giả</th>
                 <th>Thể loại</th>
                 <th>Nhà xuất bản</th>
+                <th>Tồn kho</th>
+                <th>Giá bán</th>
                 <th class="text-center">Thao tác</th>
             </tr>
         </thead>
@@ -44,6 +46,12 @@
                         </td>
                         <td class="desc text-muted">
                             <%= book.TenNXB %>
+                        </td>
+                        <td class="desc text-muted">
+                            <%= book.SoLuongTon %>
+                        </td>
+                        <td class="desc text-muted">
+                            <%= book.DonGia %>
                         </td>
                         <td class="action-col text-center">
                             <button class="btn-show-modal-update btn action-btn edit-btn" title="Chỉnh sửa">

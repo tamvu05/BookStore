@@ -89,6 +89,19 @@ const exportReceiptConfig = {
     modalUpdateId: 'update-exportReceipt-modal',
 }
 
+const orderConfig = {
+    scripts: ['/js/order.admin.js'],
+    entityName: 'đơn đặt hàng',
+    tablePartial: 'partials/order/tableOrder',
+    modalAddPartial: 'partials/order/modalOrder',
+    // modalUpdatePartial: 'partials/order/modalUpdateOrder',
+    hrefBase: '/admin/sale/order/',
+    apiBase: '/api/sale/order',
+    modalAddSelector: '#add-order-modal',
+    modalAddId: 'add-order-modal',
+    modalUpdateId: 'update-order-modal',
+}
+
 export {
     categoryConfig,
     authorConfig,
@@ -97,4 +110,5 @@ export {
     supplierConfig,
     importReceiptConfig,
     exportReceiptConfig,
+    orderConfig
 }

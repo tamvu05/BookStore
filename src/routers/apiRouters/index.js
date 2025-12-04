@@ -6,7 +6,7 @@ import bookRouter from './book.router.js'
 import supplierRouter from './supplier.router.js'
 import importReceiptRouter from './importReceipt.router.js'
 import exportReceiptRouter from './exportReceipt.router.js'
-
+import orderRouter from './order.router.js'
 
 const router = express.Router()
 
@@ -17,5 +17,6 @@ router.use('/book', bookRouter)
 router.use('/supplier', supplierRouter)
 router.use('/import-receipt', importReceiptRouter)
 router.use('/export-receipt', exportReceiptRouter)
-exportReceiptRouter
+router.use('/sale/order', orderRouter)
+
 export default router

@@ -57,4 +57,33 @@
         position: fixed;
         margin: 2px;
     }
+
+    /* 2. Cố định Sidebar và kích hoạt cuộn cho Sidebar */
+    #sidebar-wrapper {
+        /* Đã dùng d-flex và col-md-3 nên không cần position: fixed */
+        height: 100vh; /* Quan trọng: Cho sidebar chiếm trọn chiều cao */
+        overflow-y: auto; /* Kích hoạt thanh cuộn độc lập cho sidebar */
+        flex-shrink: 0; /* Ngăn sidebar bị co lại */
+    }
+
+    /* 3. Kích hoạt cuộn cho Nội dung chính */
+    #page-content-wrapper {
+        flex-grow: 1; /* Chiếm hết chiều rộng còn lại */
+        height: 100vh; /* Quan trọng: Chiếm trọn chiều cao màn hình */
+        overflow-y: auto; /* Kích hoạt thanh cuộn độc lập cho nội dung chính */
+        padding-top: 50px; /* Thêm padding để nút Toggle không che khuất nội dung */
+    }
+
+    /* 4. Điều chỉnh nút Toggle */
+    #sidebarToggle {
+        /* Giữ nguyên style gốc của bạn */
+        background-color: #e3e3e3;
+        color: #000;
+        border: none;
+        padding: 4px;
+        position: fixed; /* Cố định vị trí trên trang */
+        top: 2px;
+        left: 2px;
+        z-index: 1000; /* Đảm bảo nút nằm trên nội dung cuộn */
+    }
 </style>

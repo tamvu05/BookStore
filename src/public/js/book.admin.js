@@ -20,6 +20,8 @@ class BookFormModal {
         this.headerModal = document.querySelector('#add-book-modal-label')
         this.updateId = null
         this.imageCurrent = null
+        this.inventoryQuantity = document.querySelector('#inventory-quantity')
+        console.log(this.inventoryQuantity)
 
         this.initEventListener()
     }
@@ -116,6 +118,9 @@ class BookFormModal {
             $(this.authorInput).val(book.MaTG).trigger('change')
             $(this.categoryInput).val(book.MaTL).trigger('change')
             $(this.publisherInput).val(book.MaNXB).trigger('change')
+            this.inventoryQuantity.innerHTML = `
+                <label class="form-label">Số lượng tồn kho</label>
+                <div>${book.SoLuongTon}</div>`
         } catch (error) {
             console.log(error)
             showToast(error.message, 'danger')
@@ -133,6 +138,7 @@ class BookFormModal {
         document.querySelector('#book-image-label').textContent =
             'Chọn hình ảnh bìa'
         this.imageCurrent = null
+        this.inventoryQuantity.innerHTML = ``
     }
 
     async addNewBook() {

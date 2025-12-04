@@ -80,7 +80,7 @@ const ImportReceiptController = {
         }
     },
 
-    // // GET /api/export-receipt/:id
+    // GET /api/export-receipt/:id
     async getById(req, res, next) {
         try {
             const { id } = req.params
