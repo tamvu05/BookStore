@@ -10,14 +10,14 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#categorySubmenu"
-                    aria-expanded="true" aria-controls="categorySubmenu">
+                <a class="nav-link dropdown-toggle collapsed" data-bs-toggle="collapse" data-bs-target="#categorySubmenu"
+                    aria-expanded="false" aria-controls="categorySubmenu">
                     <i class="fas fa-folder"></i>
                     <span>Quản lý danh mục</span>
                     <i class="fas fa-chevron-down dropdown-icon"></i>
                 </a>
 
-                <div class="collapse submenu show" id="categorySubmenu">
+                <div class="collapse submenu" id="categorySubmenu">
                     <ul class="nav flex-column sub-ul">
                         <li class="nav-item">
                             <a class="nav-link" href="/admin/author">
@@ -45,14 +45,14 @@
 
 
             <li class="nav-item">
-                <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#inventorySubMenu"
-                    aria-expanded="true" aria-controls="inventorySubMenu">
+                <a class="nav-link dropdown-toggle collapsed" data-bs-toggle="collapse" data-bs-target="#inventorySubMenu"
+                    aria-expanded="false" aria-controls="inventorySubMenu">
                     <i class="fa-solid fa-warehouse"></i>
                     <span>Quản lý kho hàng</span>
                     <i class="fas fa-chevron-down dropdown-icon"></i>
                 </a>
 
-                <div class="collapse submenu show" id="inventorySubMenu">
+                <div class="collapse submenu" id="inventorySubMenu">
                     <ul class="nav flex-column sub-ul">
                         <li class="nav-item">
                             <a class="nav-link" href="/admin/supplier">
@@ -65,7 +65,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="/admin/export-receipt">
                                 <i class="fa-solid fa-file-export"></i> <span>Xuất hàng</span>
                             </a>
                         </li>
@@ -74,6 +74,55 @@
             </li>
 
 
+            <li class="nav-item">
+                <a class="nav-link dropdown-toggle collapsed" data-bs-toggle="collapse" data-bs-target="#salesSubmenu"
+                    aria-expanded="false" aria-controls="salesSubmenu">
+                    <i class="fa-solid fa-warehouse"></i>
+                    <span>Quản lý bán hàng</span>
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </a>
+
+                <div class="collapse submenu" id="salesSubmenu">
+                    <ul class="nav flex-column sub-ul">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/sale/order">
+                                <i class="fa-solid fa-truck"></i> <span>Đơn đặt hàng</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/sale/invoice">
+                                <i class="fa-solid fa-file-import"></i> <span>Hóa đơn</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+
+
+            <li class="nav-item">
+                <a class="nav-link dropdown-toggle collapsed" data-bs-toggle="collapse" data-bs-target="#promotion-submenu"
+                    aria-expanded="false" aria-controls="promotion-submenu">
+                    <i class="fa-solid fa-warehouse"></i>
+                    <span>Quản lý ưu đãi</span>
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </a>
+
+                <div class="collapse submenu" id="promotion-submenu">
+                    <ul class="nav flex-column sub-ul">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/discount">
+                                <i class="fa-solid fa-truck"></i> <span>Khuyến mãi</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/voucher">
+                                <i class="fa-solid fa-file-import"></i> <span>Mã giảm giá</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
         </ul>
     </div>
 </div>

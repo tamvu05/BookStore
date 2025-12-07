@@ -18,6 +18,11 @@ const BookModel = {
         return rows[0] || null
     },
 
+    async getQuantity(id) {
+        const [row]  = await pool.query(`SELECT SoLuongTon FROM  Sach WHERE MaSach = ?`, [id])
+        return row[0].SoLuongTon
+    },
+
     async getByISBN(isdn) {
         const [rows] = await pool.query('SELECT * FROM Sach WHERE ISBN = ?', [isdn])
         return rows[0] || null

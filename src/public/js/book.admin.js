@@ -20,6 +20,8 @@ class BookFormModal {
         this.headerModal = document.querySelector('#add-book-modal-label')
         this.updateId = null
         this.imageCurrent = null
+        this.inventoryQuantity = document.querySelector('#inventory-quantity')
+        console.log(this.inventoryQuantity)
 
         this.initEventListener()
     }
@@ -116,9 +118,17 @@ class BookFormModal {
             $(this.authorInput).val(book.MaTG).trigger('change')
             $(this.categoryInput).val(book.MaTL).trigger('change')
             $(this.publisherInput).val(book.MaNXB).trigger('change')
+            this.inventoryQuantity.innerHTML = `
+                <label class="form-label">Số lượng tồn kho</label>
+                <div>${book.SoLuongTon}</div>`
         } catch (error) {
             console.log(error)
-            showToast(error.message, 'danger')
+            Swal.close()
+            Swal.fire({
+                icon: 'error',
+                title: 'Chọn ảnh bìa thất bại!',
+                text: error.message,
+            })
         }
 
         this.imagePreview.src = this.imageCurrent
@@ -133,6 +143,7 @@ class BookFormModal {
         document.querySelector('#book-image-label').textContent =
             'Chọn hình ảnh bìa'
         this.imageCurrent = null
+        this.inventoryQuantity.innerHTML = ``
     }
 
     async addNewBook() {
@@ -153,6 +164,15 @@ class BookFormModal {
                 formData.append('HinhAnh', this.imageInput.files[0])
             }
 
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ trong giây lát!',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading()
+                },
+            })
+
             const res = await fetch('/api/book', {
                 method: 'POST',
                 body: formData,
@@ -168,13 +188,27 @@ class BookFormModal {
                 throw new Error(errorMessage)
             }
 
-            showToast('Đã thêm sách', 'success')
+            Swal.close()
+
+            Swal.fire({
+                title: 'Thêm sách thành công!',
+                icon: 'success',
+                draggable: true,
+            })
+
             this.addModal.querySelector('.btn-close').click()
 
             this.bookTableInstance.updateView(1)
         } catch (error) {
             console.log(error)
-            showToast(error.message, 'danger')
+
+            Swal.close()
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Thêm sách thất bại!',
+                text: error.message,
+            })
         }
     }
 
@@ -196,6 +230,15 @@ class BookFormModal {
                 formData.append('HinhAnh', this.imageInput.files[0])
             }
 
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ trong giây lát!',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading()
+                },
+            })
+
             const res = await fetch('/api/book/' + id, {
                 method: 'PUT',
                 body: formData,
@@ -211,7 +254,14 @@ class BookFormModal {
                 throw new Error(errorMessage)
             }
 
-            showToast('Đã cập nhật sách', 'success')
+            Swal.close()
+
+            Swal.fire({
+                title: 'Chỉnh sửa sách thành công!',
+                icon: 'success',
+                draggable: true,
+            })
+
             this.addModal.querySelector('.btn-close').click()
 
             const urlParams = new URLSearchParams(window.location.search)
@@ -220,7 +270,14 @@ class BookFormModal {
             this.bookTableInstance.updateView(page)
         } catch (error) {
             console.log(error)
-            showToast(error.message, 'danger')
+
+            Swal.close()
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Chỉnh sửa sách thất bại!',
+                text: error.message,
+            })
         }
     }
 
@@ -525,17 +582,44 @@ class BookTable {
                 }
             }
         } catch (error) {
-            showToast(error.message, 'danger')
+            Swal.close()
+            Swal.fire({
+                icon: 'error',
+                title: 'Cập nhật giao diện thất bại!',
+                text: error.message,
+            })
         }
     }
 
     async deleteEntity(btnDelete) {
+        const result = await Swal.fire({
+            title: 'Bạn có chắc muốn tiếp tục xóa?',
+            text: 'Bạn sẽ không hoàn tác được sau khi xóa!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy bỏ',
+        })
+
+        if (!result.isConfirmed) return
+
         const rowElement = btnDelete.closest('tr')
         const entityId = rowElement.dataset.id
 
         if (!entityId) return
 
         try {
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ trong giây lát!',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading()
+                },
+            })
+
             const res = await fetch(`${this.config.apiBaseUrl}/${entityId}`, {
                 method: 'DELETE',
             })
@@ -556,10 +640,23 @@ class BookTable {
             if (dataAttributeElement.dataset.totalItemPerPage < 2)
                 targetPage -= 1
 
+            Swal.close()
+
+            Swal.fire({
+                title: 'Xóa sách thành công!',
+                icon: 'success',
+                draggable: true,
+            })
+
             this.updateView(targetPage)
-            showToast(`Đã xóa ${this.config.entityName}`, 'success')
         } catch (error) {
-            showToast(error.message, 'danger')
+            Swal.close()
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Xóa sách thất bại!',
+                text: error.message,
+            })
         }
     }
 
@@ -671,7 +768,12 @@ class BookTable {
             window.URL.revokeObjectURL(url)
             document.body.removeChild(a)
         } catch (error) {
-            showToast(error, 'danger')
+            Swal.close()
+            Swal.fire({
+                icon: 'error',
+                title: 'Xuất file thất bại!',
+                text: error.message,
+            })
         }
     }
 }

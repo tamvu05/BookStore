@@ -13,25 +13,24 @@
         <thead>
             <tr>
                 <th>STT</th>
-                <th>Ngày nhập hàng</th>
-                <th><i class="sortable" data-sort="TenNCC">Tên nhà cung cấp</i></th>
-                <th>Số điện thoại</th>
-                <th>Tên nhân viên</th>
+                <th>Ngày xuất hàng</th>
+                <th><i class="sortable" data-sort="TenNCC">Tên nhân viên</i></th>
+                <th>Nội dung</th>
                 <th class="text-center">Thao tác</th>
             </tr>
         </thead>
         <tbody>
 
-            <% if (importReceipts.length> 0) { %>
+            <% if (exportReceipts.length> 0) { %>
 
-                <% importReceipts.forEach((importReceipt, index)=> { %>
+                <% exportReceipts.forEach((exportReceipt, index)=> { %>
 
-                    <tr data-id="<%= importReceipt.MaPN %>">
+                    <tr data-id="<%= exportReceipt.MaPX %>">
                         <td>
                             <%= index + 1 %>
                         </td>
                         <td class="text-muted">
-                            <%= importReceipt.NgayNhap.toLocaleString('vi-VN', {
+                            <%= exportReceipt.NgayXuat.toLocaleString('vi-VN', {
                                 year: 'numeric',
                                 month: '2-digit',
                                 day: '2-digit',
@@ -42,13 +41,10 @@
                             }) %>
                         </td>
                         <td class="text-muted">
-                            <%= importReceipt.TenNCC %>
+                            <%= exportReceipt.HoTen %> 
                         </td>
                         <td class="text-muted">
-                            <%= importReceipt.SDT %>
-                        </td>
-                        <td class="text-muted">
-                            <%= importReceipt.HoTen %> 
+                            <%= exportReceipt.NoiDung %> 
                         </td>
                         <td class="action-col text-center">
                             <button class="btn-show-details btn action-btn view-btn" title="Xem chi tiết">
@@ -57,7 +53,6 @@
                         </td>
                     </tr>
                     <% }) %>
-
                         <% } else { %>
 
                             <tr class="no-data">

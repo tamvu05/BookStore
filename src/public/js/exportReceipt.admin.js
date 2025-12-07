@@ -1,18 +1,16 @@
 import showToast from './toast.js'
 import getCurrentVietNamTime from './getCurrentVietNamTime.js'
 
-class ImportReceiptFormModal {
-    constructor(importReceiptTableInstance) {
-        this.importReceiptTableInstance = importReceiptTableInstance
+class ExportReceiptFormModal {
+    constructor(exportReceiptTableInstance) {
+        this.exportReceiptTableInstance = exportReceiptTableInstance
 
         // Modal và Buttons
-        this.modal = document.querySelector('#add-importReceipt-modal')
+        this.modal = document.querySelector('#add-exportReceipt-modal')
         this.btnSave = document.querySelector('.btn-save-receipt')
         this.btnAddItem = document.querySelector('.btn-add-item')
 
         // Các trường Form chính
-        this.selectSupplier = document.querySelector('#supplier-select')
-        this.selectEmployee = document.querySelector('#employee-select')
         this.inputDate = document.querySelector('#receipt-date-input')
         this.textareaNotes = document.querySelector('#receipt-notes-textarea')
 
@@ -27,10 +25,8 @@ class ImportReceiptFormModal {
             '#receipt-total-amount'
         )
 
-        // Danh sách các mặt hàng đã chọn (để quản lý trùng lặp và xóa)
-        this.selectedItems = new Map() // Key: MaSach, Value: Object ChiTiet
+        this.selectedItems = new Map()
 
-        this.initCurrentVNTime()
         this.initEventListeners()
         this.initSelect2()
         this.renderTotalAmount()
@@ -44,8 +40,7 @@ class ImportReceiptFormModal {
             dropdownParent: $(this.modal),
         }
 
-        $('#supplier-select').select2(select2Config)
-
+        // Select2 cho Chọn Sách
         $('#book-select-item').select2({
             ...select2Config,
             placeholder: 'Chọn sách',
@@ -53,7 +48,6 @@ class ImportReceiptFormModal {
     }
 
     initEventListeners() {
-        // Sự kiện Lưu Phiếu Nhập
         if (this.btnSave) {
             this.btnSave.addEventListener(
                 'click',
@@ -61,7 +55,6 @@ class ImportReceiptFormModal {
             )
         }
 
-        // Sự kiện Thêm Chi tiết Sách
         if (this.btnAddItem) {
             this.btnAddItem.addEventListener(
                 'click',
@@ -69,7 +62,6 @@ class ImportReceiptFormModal {
             )
         }
 
-        // Sự kiện Xóa Chi tiết hoặc thay đổi SL/Đơn giá trong bảng
         if (this.itemsBody) {
             this.itemsBody.addEventListener(
                 'click',
@@ -81,20 +73,44 @@ class ImportReceiptFormModal {
             )
         }
 
-        // Đóng modal
         if (this.modal) {
             this.modal.addEventListener(
                 'hidden.bs.modal',
                 this.resetModal.bind(this)
             )
+
+            this.modal.addEventListener('show.bs.modal', async () => {
+                await this.loadBookSelect()
+            })
         }
     }
 
-    initCurrentVNTime() {
+    async loadBookSelect() {
+        try {
+            const res = await fetch('/api/book/')
+            const books = await res.json()
+
+            let html = '<option value="">Chọn sách</option>'
+            for (const book of books) {
+                html += `
+                <option value="${book.MaSach}" data-price="${book.DonGia}">
+                    ${book.TenSach} (ISBN: ${book.ISBN}, Số lượng tồn: ${book.SoLuongTon}) 
+                </option>`
+            }
+
+            this.selectBookItem.innerHTML = html
+        } catch (error) {
+            const errorMessage =
+                data.message ||
+                data.error ||
+                `Lỗi HTTP ${res1.status}: Thao tác thất bại.`
+            throw new Error(errorMessage)
+        }
+
         this.inputDate.setAttribute('value', getCurrentVietNamTime())
     }
 
-    // --- LOGIC THAO TÁC CHI TIẾT SÁCH ---
+    // --- LOGIC THAO TÁC CHI TIẾT SÁCH (Giữ nguyên) ---
 
     handleItemAction(event) {
         const btnDelete = event.target.closest('.btn-remove-item')
@@ -116,11 +132,11 @@ class ImportReceiptFormModal {
             const item = this.selectedItems.get(itemId)
 
             if (field === 'quantity') {
-                value = Math.max(1, value) // SL tối thiểu là 1
+                value = Math.max(1, value)
                 inputElement.value = value
                 item.SoLuong = value
             } else if (field === 'price') {
-                value = Math.max(0, value) // Đơn giá tối thiểu là 0
+                value = Math.max(0, value)
                 inputElement.value = value
                 item.DonGia = value
             }
@@ -130,7 +146,7 @@ class ImportReceiptFormModal {
         }
     }
 
-    addItemDetail() {
+    async addItemDetail() {
         const bookId = this.selectBookItem.value
         const bookName =
             this.selectBookItem.options[this.selectBookItem.selectedIndex]?.text
@@ -151,6 +167,20 @@ class ImportReceiptFormModal {
                 'warning'
             )
             return
+        }
+
+        const res = await fetch('/api/book/quantity/' + bookId)
+        const bookQuantity = await res.json()
+
+        if (quantity > bookQuantity) {
+            this.modal
+                .querySelector('.out-of-stock-error')
+                .classList.remove('d-none')
+            return
+        } else {
+            this.modal
+                .querySelector('.out-of-stock-error')
+                .classList.add('d-none')
         }
 
         const newItem = {
@@ -218,12 +248,14 @@ class ImportReceiptFormModal {
     }
 
     // --- LOGIC GỬI DỮ LIỆU VÀ VALIDATION FORM CHÍNH ---
-
     async createReceipt() {
         try {
-            if (!this.validateForm()) return
+            const ok = await this.validateForm()
+            if (!ok) {
+                return
+            }
 
-            const ChiTietPN = Array.from(this.selectedItems.values()).map(
+            const ChiTietPX = Array.from(this.selectedItems.values()).map(
                 (item) => ({
                     MaSach: item.MaSach,
                     SoLuong: item.SoLuong,
@@ -232,14 +264,13 @@ class ImportReceiptFormModal {
             )
 
             const payload = {
-                MaNCC: this.selectSupplier.value,
-                MaNV: '1',
-                NgayNhap: this.inputDate.value,
+                MaNV: 1, // Đổi thành mã NV sau
+                NgayXuat: this.inputDate.value,
                 NoiDung: this.textareaNotes.value.trim(),
-                ChiTietPN: ChiTietPN,
+                ChiTietPX: ChiTietPX,
             }
 
-            const res = await fetch('/api/import-receipt', {
+            const res = await fetch('/api/export-receipt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -255,33 +286,25 @@ class ImportReceiptFormModal {
                 throw new Error(errorMessage)
             }
 
-            showToast('Đã tạo phiếu nhập hàng', 'success')
+            showToast('Đã tạo phiếu xuất hàng', 'success')
             this.modal.querySelector('.btn-close').click()
-
-            this.importReceiptTableInstance.updateView(1)
+            this.exportReceiptTableInstance.updateView(1)
         } catch (error) {
-            console.error('Lỗi khi tạo phiếu nhập:', error)
+            console.error('Lỗi khi tạo phiếu xuất:', error)
             showToast(error.message, 'danger')
         }
     }
 
-    validateForm() {
+    async validateForm() {
         const requiredSelectors = [
-            {
-                element: this.selectSupplier,
-                errorClass: 'empty-supplier',
-                message: 'Vui lòng chọn nhà cung cấp!',
-            },
             {
                 element: this.inputDate,
                 errorClass: 'empty-date',
-                message: 'Vui lòng chọn ngày nhập!',
+                message: 'Vui lòng chọn ngày xuất!',
             },
         ]
 
-        let hasError = false
-
-        //Kiểm tra trường bắt buộc
+        // Kiểm tra trường bắt buộc
         for (const field of requiredSelectors) {
             const errorElement = this.modal.querySelector(
                 `.${field.errorClass}`
@@ -290,20 +313,22 @@ class ImportReceiptFormModal {
 
             if (!value || value === '' || value === null) {
                 errorElement.classList.remove('d-none')
-                hasError = true
+                return false
             } else {
                 errorElement.classList.add('d-none')
             }
         }
 
-        //Kiểm tra Chi tiết Phiếu (Items)
+        // Kiểm tra Chi tiết Phiếu (Items)
         const itemsErrorEl = this.modal.querySelector('.items-error')
         if (this.selectedItems.size === 0) {
             itemsErrorEl.classList.remove('d-none')
-            hasError = true
+            return false
         } else {
             itemsErrorEl.classList.add('d-none')
         }
+
+        let hasError = false
 
         // Kiểm tra tính hợp lệ của SL/Đơn giá trong bảng
         if (!hasError && this.selectedItems.size > 0) {
@@ -311,22 +336,43 @@ class ImportReceiptFormModal {
                 '.invalid-item-amount'
             )
             let isValid = true
-            this.selectedItems.forEach((item) => {
+            let outOfStock = false
+            for (const item of this.selectedItems) {
+                const id = item[0]
+                const book = item[1]
+
                 if (
-                    item.SoLuong <= 0 ||
-                    item.DonGia < 0 ||
-                    isNaN(item.SoLuong) ||
-                    isNaN(item.DonGia)
+                    book.SoLuong <= 0 ||
+                    book.DonGia < 0 ||
+                    isNaN(book.SoLuong) ||
+                    isNaN(book.DonGia)
                 ) {
                     isValid = false
+                    break
                 }
-            })
+
+                const res = await fetch('/api/book/quantity/' + id)
+                const stock = await res.json()
+
+                if (book.SoLuong > stock) {
+                    outOfStock = true
+                    break
+                }
+            }
 
             if (!isValid) {
                 invalidAmountErrorEl.classList.remove('d-none')
                 hasError = true
+            } else if (outOfStock) {
+                this.modal
+                    .querySelector('.out-of-stock-error2')
+                    .classList.remove('d-none')
+                hasError = true
             } else {
                 invalidAmountErrorEl.classList.add('d-none')
+                this.modal
+                    .querySelector('.out-of-stock-error2')
+                    .classList.add('d-none')
             }
         }
 
@@ -341,7 +387,7 @@ class ImportReceiptFormModal {
         this.inputUnitPrice.value = 0
 
         // Reset Select2 fields
-        $(this.selectSupplier).val(null).trigger('change')
+        // ❌ Không cần selectSupplier
         $(this.selectEmployee).val(null).trigger('change')
         $(this.selectBookItem).val(null).trigger('change')
 
@@ -357,11 +403,12 @@ class ImportReceiptFormModal {
     }
 }
 
-class ImportReceiptTable {
+// --- Class 2: ExportReceiptTable (Quản lý Bảng, Phân trang, Sự kiện) ---
+class ExportReceiptTable {
     constructor() {
         this.config = {
-            apiBaseUrl: '/api/import-receipt',
-            entityName: 'phiếu nhập hàng',
+            apiBaseUrl: '/api/export-receipt', // Endpoint đổi thành export-receipt
+            entityName: 'phiếu xuất hàng',
         }
         this.tableWrapper = document.querySelector('#table-view-manager')
         this.paginationWrapper = document.querySelector(
@@ -373,21 +420,22 @@ class ImportReceiptTable {
         this.searchInput = document.querySelector(
             '.manager-container .search-value'
         )
-        // Dùng optional chaining cho tableWrapper nếu nó không tồn tại ngay
         this.sortableHeaders =
             this.tableWrapper?.querySelectorAll('tr .sortable')
 
-        this.importDetailModalInstance = null
+        this.exportDetailModalInstance = null // Đổi tên instance
 
         this.loadInitialState()
         this.initEventListener()
     }
 
     loadInitialState() {
+        // Đổi placeholder cho phù hợp
         this.searchInput.setAttribute(
             'placeholder',
-            'Tìm kiếm theo tên nhà cung cấp'
+            'Tìm kiếm theo tên nhân viên'
         )
+
         const urlParams = new URLSearchParams(window.location.search)
 
         const page = urlParams.get('page')
@@ -410,16 +458,12 @@ class ImportReceiptTable {
                 const btnDetails = event.target.closest('.btn-show-details')
                 const sortableHeader = event.target.closest('tr i.sortable')
 
-                // Xem Chi tiết
                 if (btnDetails) {
                     const id = btnDetails.closest('tr').dataset.id
-                    this.importDetailModalInstance.showModal(id)
-                }
-                // Sắp xếp
-                else if (sortableHeader) this.sortData(sortableHeader)
+                    this.exportDetailModalInstance.showModal(id)
+                } else if (sortableHeader) this.sortData(sortableHeader)
             })
 
-        // Phân trang
         if (this.paginationWrapper) {
             this.paginationWrapper.addEventListener('click', (e) => {
                 e.preventDefault()
@@ -427,10 +471,8 @@ class ImportReceiptTable {
             })
         }
 
-        // back/forward trình duyệt
         window.addEventListener('popstate', this.handlePopState.bind(this))
 
-        // search
         if (this.btnSearch) {
             this.btnSearch.addEventListener(
                 'click',
@@ -454,10 +496,11 @@ class ImportReceiptTable {
         }
     }
 
-    setImportDetailModalInstance(instance) {
-        this.importDetailModalInstance = instance
+    setExportDetailModalInstance(instance) {
+        this.exportDetailModalInstance = instance
     }
 
+    // ... (Các hàm còn lại: handlePageChange, updateView, sortData, handlePopState, handleSearch, debounced, exportExcel giữ nguyên logic của ImportReceiptTable, chỉ thay đổi tên biến và endpoint API) ...
     handlePageChange(targetElement) {
         const pageLink = targetElement.closest('.page-link')
         if (!pageLink) return
@@ -526,39 +569,7 @@ class ImportReceiptTable {
         }
     }
 
-    async deleteEntity(btnDelete) {
-        const rowElement = btnDelete.closest('tr')
-        const entityId = rowElement.dataset.id
-
-        if (!entityId) return
-
-        try {
-            const res = await fetch(`${this.config.apiBaseUrl}/${entityId}`, {
-                method: 'DELETE',
-            })
-
-            const data = await res.json()
-
-            if (!res.ok)
-                throw new Error(
-                    data.message ||
-                        data.error ||
-                        `Lỗi HTTP ${res.status}: Thao tác xóa thất bại.`
-                )
-
-            const dataAttributeElement =
-                this.tableWrapper.querySelector('#data-attribute')
-            let targetPage = dataAttributeElement.dataset.currentPage
-
-            if (dataAttributeElement.dataset.totalItemPerPage < 2)
-                targetPage -= 1
-
-            this.updateView(targetPage)
-            showToast(`Đã xóa ${this.config.entityName}`, 'success')
-        } catch (error) {
-            showToast(error.message, 'danger')
-        }
-    }
+    // Tạm thời bỏ hàm deleteEntity vì không có nút xóa trong tableExportReceipt.ejs
 
     sortData(currentHeader) {
         if (!this.sortableHeaders) return
@@ -646,15 +657,43 @@ class ImportReceiptTable {
         }
     }
 
-   
+    // Hàm Export cần điều chỉnh endpoint và tên file
+    async exportExcel() {
+        try {
+            const res = await fetch(`${this.config.apiBaseUrl}/export`)
+            if (!res.ok)
+                throw new Error(`Lỗi HTTP ${res.status}: Không thể tải file.`)
+
+            const blob = await res.blob()
+            const url = window.URL.createObjectURL(blob)
+
+            const a = document.createElement('a')
+            a.href = url
+
+            const disposition = res.headers.get('content-disposition')
+            let filename = 'DanhSachPhieuXuat.xlsx' // Đổi tên file
+            if (disposition && disposition.indexOf('filename=') !== -1) {
+                filename = disposition.split('filename=')[1].replace(/"/g, '')
+            }
+            a.download = filename
+
+            document.body.appendChild(a)
+            a.click()
+
+            window.URL.revokeObjectURL(url)
+            document.body.removeChild(a)
+        } catch (error) {
+            showToast(error, 'danger')
+        }
+    }
 }
 
+// --- Class 3: DetailModal (Xem Chi tiết Phiếu Xuất) ---
 class DetailModal {
     constructor(tableInstance) {
         this.tableInstance = tableInstance
         this.modal = document.querySelector('#view-import-receipt-modal')
-        this.labelDate = this.modal.querySelector('#view-ngaynhap')
-        this.labelSupplier = this.modal.querySelector('#view-ncc-ten')
+        this.labelDate = this.modal.querySelector('#view-ngayxuat')
         this.labelEmployee = this.modal.querySelector('#view-nv-ten')
         this.labelNote = this.modal.querySelector('#view-noidung')
         this.tableDetaile = this.modal.querySelector('#view-receipt-items-body')
@@ -675,7 +714,7 @@ class DetailModal {
 
     async initValue(id) {
         try {
-            const res1 = await fetch('/api/import-receipt/' + id)
+            const res1 = await fetch('/api/export-receipt/' + id)
             const receipt = await res1.json()
 
             if (!res1.ok) {
@@ -686,7 +725,7 @@ class DetailModal {
                 throw new Error(errorMessage)
             }
 
-            const res2 = await fetch('/api/import-receipt/detail/' + id)
+            const res2 = await fetch('/api/export-receipt/detail/' + id)
             const details = await res2.json()
 
             if (!res2.ok) {
@@ -697,23 +736,23 @@ class DetailModal {
                 throw new Error(errorMessage)
             }
 
-            this.labelDate.textContent = this.formatToVietNamTime(receipt.NgayNhap)
+            this.labelDate.textContent = this.formatToVietNamTime(
+                receipt.NgayXuat
+            )
             this.labelEmployee.textContent = receipt.HoTen
-            this.labelSupplier.textContent = receipt.TenNCC
             this.labelNote.textContent = receipt.NoiDung
 
-            // Tạo nội dung table sách
             let html = ''
-
             let totalPrice = 0
+
             details.forEach((detail) => {
-                const price = detail.DonGiaNhap * detail.SoLuong
+                const price = detail.DonGiaXuat * detail.SoLuong
                 totalPrice += price
                 html += `
                     <tr>
                         <td class="text-end">${detail.TenSach}</td>
                         <td class="text-end">${detail.SoLuong}</td>
-                        <td class="text-end">${detail.DonGiaNhap.toLocaleString(
+                        <td class="text-end">${detail.DonGiaXuat.toLocaleString(
                             'vi-VN'
                         )}</td>
                         <td class="text-end">${price.toLocaleString(
@@ -726,7 +765,7 @@ class DetailModal {
             this.tableDetaile.innerHTML = html
             this.totalPrice.textContent = totalPrice.toLocaleString('vi-VN')
         } catch (error) {
-            console.error('Lỗi khi hiển thị chi tiết phiếu nhập:', error)
+            console.error('Lỗi khi hiển thị chi tiết phiếu xuất:', error)
             showToast(error.message, 'danger')
         }
     }
@@ -734,28 +773,27 @@ class DetailModal {
     formatToVietNamTime(dateInput) {
         const dateObject = new Date(dateInput)
 
-        // Tùy chọn định dạng cho Việt Nam (UTC+7)
         const options = {
-            timeZone: 'Asia/Ho_Chi_Minh', // Múi giờ chuẩn của Việt Nam
+            timeZone: 'Asia/Ho_Chi_Minh',
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            hour12: false, // Đảm bảo định dạng 24 giờ
+            hour12: false,
         }
-
-        // Sử dụng locale 'vi-VN' và options để định dạng
         return dateObject.toLocaleString('vi-VN', options)
     }
 }
 
+// --- Khởi tạo ứng dụng ---
 document.addEventListener('DOMContentLoaded', () => {
-    const importReceiptTable = new ImportReceiptTable()
-    const importReceiptFormModal = new ImportReceiptFormModal(
-        importReceiptTable
+    const exportReceiptTable = new ExportReceiptTable()
+    const exportReceiptFormModal = new ExportReceiptFormModal(
+        exportReceiptTable
     )
-    const detailModal = new DetailModal(importReceiptTable)
-    importReceiptTable.setImportDetailModalInstance(detailModal)
+    const detailModal = new DetailModal(exportReceiptTable)
+
+    exportReceiptTable.setExportDetailModalInstance(detailModal)
 })

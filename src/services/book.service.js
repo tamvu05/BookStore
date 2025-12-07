@@ -124,6 +124,11 @@ const BookService = {
         return book
     },
 
+    async getQuantity(id) {
+        const quanity = await BookModel.getQuantity(id)
+        return quanity
+    },
+
     async getWithDetails() {
         const books = await BookModel.getWithDetails()
         return books

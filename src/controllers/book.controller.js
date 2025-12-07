@@ -174,21 +174,36 @@ const BookController = {
         }
     },
 
-    // GET /admin/book
+    // GET /api/book
     async getAll(req, res, next) {
-        const data = await BookService.getAll(1, 100) // Admin tạm thời lấy nhiều sách
-        res.render('admin/book', {
-            title: 'Admin Dashboard',
-            data: data.books,
-            layout: 'layouts/adminLayout', // Chỉ định layout Admin
-        })
+        try {
+            const books = await BookService.getAllJSON() // Admin tạm thời lấy nhiều sách
+            res.json(books)
+        } catch (error) {
+            next(error)
+        }
     },
 
     // GET /admin/book/:id
     async getById(req, res, next) {
-        const { id } = req.params
-        const data = await BookService.getByIdJSON(id)
-        res.json(data)
+        try {
+            const { id } = req.params
+            const data = await BookService.getByIdJSON(id)
+            res.json(data)
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    // GET /api/book/quantity/:id
+    async getQuantity(req, res, next) {
+        try {
+            const { id } = req.params
+            const quanity = await BookService.getQuantity(id)
+            res.json(quanity)
+        } catch (error) {
+            next(error)
+        }
     },
 
     // POST /api/book

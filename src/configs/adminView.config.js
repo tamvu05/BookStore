@@ -76,4 +76,62 @@ const importReceiptConfig = {
     modalUpdateId: 'update-importReceipt-modal',
 }
 
-export { categoryConfig, authorConfig, publisherConfig, bookConfig, supplierConfig, importReceiptConfig }
+const exportReceiptConfig = {
+    scripts: ['/js/exportReceipt.admin.js'],
+    entityName: 'phiếu xuất',
+    tablePartial: 'partials/exportReceipt/tableExportReceipt',
+    modalAddPartial: 'partials/exportReceipt/modalExportReceipt',
+    // modalUpdatePartial: 'partials/exportReceipt/modalUpdateExportReceipt',
+    hrefBase: '/admin/export-receipt/',
+    apiBase: '/api/export-receipt',
+    modalAddSelector: '#add-exportReceipt-modal',
+    modalAddId: 'add-exportReceipt-modal',
+    modalUpdateId: 'update-exportReceipt-modal',
+}
+
+const orderConfig = {
+    scripts: ['/js/order.admin.js'],
+    entityName: 'đơn đặt hàng',
+    tablePartial: 'partials/order/tableOrder',
+    modalAddPartial: 'partials/order/modalOrder',
+    // modalUpdatePartial: 'partials/order/modalUpdateOrder',
+    hrefBase: '/admin/sale/order/',
+    apiBase: '/api/sale/order',
+    modalAddSelector: '#add-order-modal',
+    modalAddId: 'add-order-modal',
+    modalUpdateId: 'update-order-modal',
+}
+
+const invoiceConfig = {
+    scripts: ['/js/invoice.admin.js'],
+    entityName: 'hóa đơn',
+    tablePartial: 'partials/invoice/tableInvoice',
+    modalAddPartial: 'partials/invoice/modalInvoice',
+    // modalUpdatePartial: 'partials/invoice/modalUpdateInvoice',
+    hrefBase: '/admin/sale/invoice/',
+    apiBase: '/api/sale/invoice',
+    modalAddSelector: '#add-invoice-modal',
+    modalAddId: 'add-invoice-modal',
+    modalUpdateId: 'update-invoice-modal',
+}
+
+
+const voucherConfig = {
+    scripts: ['/js/voucher.admin.js'],
+    hrefBase: '/admin/voucher/',
+    apiBase: '/api/voucher',
+    modalId: 'voucher-modal'
+}
+
+export {
+    categoryConfig,
+    authorConfig,
+    publisherConfig,
+    bookConfig,
+    supplierConfig,
+    importReceiptConfig,
+    exportReceiptConfig,
+    orderConfig,
+    invoiceConfig,
+    voucherConfig,
+}
