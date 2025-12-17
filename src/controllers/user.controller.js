@@ -1,38 +1,44 @@
 import UserService from '../services/user.service.js';
 
 const UserController = {
-    // GET /profile
     async getProfile(req, res) {
-        // 1. Kiểm tra xem đã đăng nhập chưa?
-        if (!req.session.user) {
-            return res.redirect('/login'); // Chưa thì đá về login
-        }
-
-        // 2. Lấy ID từ session
+        if (!req.session.user) return res.redirect('/login');
         const userId = req.session.user.id;
-
-        // 3. Gọi Service lấy dữ liệu
         const userProfile = await UserService.getProfile(userId);
 
-        // 4. Render giao diện
         res.render('user/profile', {
             title: 'Thông tin tài khoản',
             profile: userProfile,
-            path: '/profile' // Để active menu nếu cần
+            path: '/profile'
         });
     },
 
-    // POST /profile/update (Xử lý cập nhật)
     async updateProfile(req, res) {
         if (!req.session.user) return res.redirect('/login');
-        
         const userId = req.session.user.id;
-        await UserService.updateProfile(userId, req.body);
+
+        // 1. Gọi Service
+        const result = await UserService.updateProfile(userId, req.body);
         
-        // Cập nhật lại session fullname nếu đổi tên
-        req.session.user.fullname = req.body.HoTen;
+        // 2. Cập nhật session nếu cần
+        if (result.success) req.session.user.fullname = req.body.HoTen;
+
+        // 3. Lấy lại dữ liệu mới để hiển thị
+        const userProfile = await UserService.getProfile(userId);
         
-        res.redirect('/profile'); // Load lại trang để thấy thay đổi
+        // 4. Render lại trang kèm gói 'alert'
+        res.render('user/profile', {
+            title: 'Thông tin tài khoản',
+            profile: userProfile,
+            path: '/profile',
+            
+            // 👇 Tạo gói tin thông báo gửi sang EJS
+            alert: {
+                type: result.success ? 'success' : 'error',
+                title: result.success ? 'Thành công' : 'Thất bại',
+                message: result.message
+            }
+        });
     }
 };
 

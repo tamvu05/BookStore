@@ -20,34 +20,55 @@ const AuthController = {
         })
     },
 
-    // CẬP NHẬT HÀM NÀY ĐỂ HIỂN THỊ POPUP THÀNH CÔNG
+    // ✅ HÀM ĐĂNG KÝ ĐÃ CẬP NHẬT
     async handleRegister(req, res) {
         try {
             const { fullname, email, password, confirmPassword } = req.body
-            if (password !== confirmPassword) throw new Error('Mật khẩu nhập lại không khớp!')
-
-            await AuthService.register({ fullname, email, password })
             
-            // Thay vì redirect ngay, ta render trang Login kèm thông báo
-            res.render('user/login', {
-                title: 'Đăng nhập - BookStore',
-                path: '/login',
-                error: null,
-                alert: {
-                    type: 'success',
-                    title: 'Đăng ký thành công!',
-                    message: 'Tài khoản của bạn đã được tạo. Vui lòng đăng nhập.'
-                }
-            })
+            // Validate cơ bản tại Controller
+            if (password !== confirmPassword) {
+                 return res.render('user/register', {
+                    title: 'Đăng ký - BookStore',
+                    path: '/register',
+                    error: 'Mật khẩu nhập lại không khớp!',
+                })
+            }
+
+            // Gọi Service và nhận kết quả
+            const result = await AuthService.register({ fullname, email, password })
+            
+            if (result.success) {
+                // THÀNH CÔNG: Chuyển sang trang Login + Popup thông báo
+                res.render('user/login', {
+                    title: 'Đăng nhập - BookStore',
+                    path: '/login',
+                    error: null,
+                    alert: {
+                        type: 'success',
+                        title: 'Đăng ký thành công!',
+                        message: result.message
+                    }
+                })
+            } else {
+                // THẤT BẠI: Ở lại trang Đăng ký + Báo lỗi
+                res.render('user/register', {
+                    title: 'Đăng ký - BookStore',
+                    path: '/register',
+                    error: result.message,
+                })
+            }
+
         } catch (err) {
+            // Phòng hờ lỗi crash server
             res.render('user/register', {
                 title: 'Đăng ký - BookStore',
                 path: '/register',
-                error: err.message,
+                error: 'Đã có lỗi xảy ra: ' + err.message,
             })
         }
     },
 
+    // --- CÁC HÀM DƯỚI GIỮ NGUYÊN ---
     async handleLogin(req, res) {
         try {
             const { email, password, remember } = req.body
@@ -55,7 +76,6 @@ const AuthController = {
 
             req.session.user = user
 
-            // Logic ghi nhớ đăng nhập
             if (remember === 'on') {
                 req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000
             } else {
@@ -79,7 +99,6 @@ const AuthController = {
         })
     },
 
-    // GET /api/auth/logout
     async logoutAdmin(req, res) {
         req.session.destroy((err) => {
             if (err) {
@@ -90,7 +109,6 @@ const AuthController = {
         })
     },
 
-    // --- QUÊN MẬT KHẨU ---
     forgotPasswordPage(req, res) {
         res.render('user/forgot-password', { title: 'Quên mật khẩu', path: '/login', error: null })
     },
@@ -140,7 +158,6 @@ const AuthController = {
 
             await AuthService.resetPassword(email, password)
             
-            // Đổi mật khẩu thành công cũng hiện popup luôn cho xịn
             res.render('user/login', {
                 title: 'Đăng nhập - BookStore',
                 path: '/login',
@@ -161,7 +178,6 @@ const AuthController = {
         }
     },
 
-    // ADMIN LOGIN
     async loginAdminPage(req, res, next) {
         try {
             res.render('admin/login', {

@@ -68,3 +68,20 @@
 
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<% if (typeof alert !== 'undefined' && alert) { %>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: '<%= alert.type %>',      // success hoặc error
+                title: '<%= alert.title %>',    // Tiêu đề
+                text: '<%= alert.message %>',   // Nội dung
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#0d6efd',
+                timer: 2000                     // Tự tắt sau 2 giây
+            });
+        });
+    </script>
+<% } %>

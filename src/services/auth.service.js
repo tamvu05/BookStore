@@ -1,24 +1,28 @@
 import pool from '../configs/db.js'
 import bcrypt from 'bcrypt'
-import crypto from 'crypto' // Import để tạo mã token ngẫu nhiên
-import { sendMail } from '../utils/mailer.js' // Import hàm gửi mail
+import crypto from 'crypto'
+import { sendMail } from '../utils/mailer.js'
 
 const AuthService = {
-    // --- ĐĂNG KÝ (Giữ nguyên) ---
+    // --- ĐĂNG KÝ (Đã chuẩn hóa trả về Object) ---
     async register({ fullname, email, password }) {
         let connection
         try {
+            // 1. Kiểm tra Email tồn tại
             const [existingUser] = await pool.query('SELECT * FROM TaiKhoan WHERE TenDangNhap = ?', [email])
             if (existingUser.length > 0) {
-                throw new Error('Email này đã được sử dụng!')
+                return { success: false, message: 'Email này đã được sử dụng!' }
             }
 
+            // 2. Mã hóa mật khẩu
             const salt = await bcrypt.genSalt(10)
             const hashedPassword = await bcrypt.hash(password, salt)
 
+            // 3. Bắt đầu Transaction
             connection = await pool.getConnection()
             await connection.beginTransaction()
 
+            // Tạo Tài Khoản
             const [userResult] = await connection.query(
                 `INSERT INTO TaiKhoan (TenDangNhap, MatKhauHash, TrangThai, VaiTro) 
                  VALUES (?, ?, 'ACTIVE', 2)`,
@@ -26,19 +30,25 @@ const AuthService = {
             )
             const newUserId = userResult.insertId
 
+            // Tạo Khách Hàng
             await connection.query(`INSERT INTO KhachHang (HoTen, Email, MaTK) VALUES (?, ?, ?)`, [fullname, email, newUserId])
 
             await connection.commit()
-            return true
+            
+            // ✅ Trả về kết quả Thành Công
+            return { success: true, message: 'Đăng ký tài khoản thành công! Vui lòng đăng nhập.' }
+
         } catch (error) {
             if (connection) await connection.rollback()
-            throw error
+            console.error('Lỗi đăng ký:', error)
+            // ❌ Trả về kết quả Thất Bại
+            return { success: false, message: 'Lỗi hệ thống: ' + error.message }
         } finally {
             if (connection) connection.release()
         }
     },
 
-    // --- ĐĂNG NHẬP (Giữ nguyên) ---
+    // --- CÁC HÀM DƯỚI GIỮ NGUYÊN ---
     async login(email, password) {
         const [users] = await pool.query('SELECT * FROM TaiKhoan WHERE TenDangNhap = ?', [email])
         const user = users[0]
@@ -73,9 +83,6 @@ const AuthService = {
 
         if (user.TrangThai !== 'ACTIVE') throw new Error('Tài khoản đã bị khóa')
 
-        // const [admin] = await pool.query('SELECT * FROM NhanVien WHERE MaTK = ?', [user.MaTK])
-        // const account = admin[0]
-
         return {
             MaTK: user.MaTK,
             email: user.TenDangNhap,
@@ -83,19 +90,15 @@ const AuthService = {
         }
     },
 
-    // 1. GỬI MÃ OTP (Thay vì gửi Link)
     async sendOtp(email) {
         const [users] = await pool.query('SELECT * FROM TaiKhoan WHERE TenDangNhap = ?', [email])
         if (users.length === 0) throw new Error('Email không tồn tại')
 
-        // Sinh mã 6 số ngẫu nhiên
         const otp = Math.floor(100000 + Math.random() * 900000).toString()
-        const expireTime = new Date(Date.now() + 5 * 60 * 1000) // Hết hạn sau 5 phút
+        const expireTime = new Date(Date.now() + 5 * 60 * 1000)
 
-        // Lưu OTP vào DB
         await pool.query('UPDATE TaiKhoan SET ResetToken = ?, TokenExp = ? WHERE TenDangNhap = ?', [otp, expireTime, email])
 
-        // Gửi Email chứa mã
         const htmlContent = `
             <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
                 <h2 style="color: #0d6efd;">Mã xác minh của bạn</h2>
@@ -105,25 +108,19 @@ const AuthService = {
                 <p style="color: red;">Mã này sẽ hết hạn sau 5 phút.</p>
             </div>
         `
-
         await sendMail(email, 'Mã xác minh BookStore', htmlContent)
         return true
     },
 
-    // 2. KIỂM TRA MÃ OTP
     async verifyOtp(email, otp) {
         const [users] = await pool.query('SELECT * FROM TaiKhoan WHERE TenDangNhap = ? AND ResetToken = ? AND TokenExp > NOW()', [email, otp])
-
         if (users.length === 0) return false
         return true
     },
 
-    // 3. ĐỔI MẬT KHẨU (Dùng email để xác định)
     async resetPassword(email, newPassword) {
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(newPassword, salt)
-
-        // Update pass và xóa OTP
         await pool.query('UPDATE TaiKhoan SET MatKhauHash = ?, ResetToken = NULL, TokenExp = NULL WHERE TenDangNhap = ?', [hashedPassword, email])
         return true
     },
