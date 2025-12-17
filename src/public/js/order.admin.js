@@ -1,22 +1,7 @@
 import BaseTable from './base.table.js'
+import helpers from './helpers.js'
 
 const DANG_GIAO = 'DA_GIAO_CHO_DON_VI_VAN_CHUYEN'
-
-function formatToVietNamTime(dateInput) {
-    const dateObject = new Date(dateInput)
-
-    const options = {
-        timeZone: 'Asia/Ho_Chi_Minh',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-    }
-    return dateObject.toLocaleString('vi-VN', options)
-}
 
 class OrderModal {
     constructor(orderTableInstance) {
@@ -58,7 +43,6 @@ class OrderModal {
             )
         }
 
-        // Đóng modal (reset trạng thái)
         if (this.modal) {
             this.modal.addEventListener(
                 'hidden.bs.modal',
@@ -67,24 +51,6 @@ class OrderModal {
         }
     }
 
-    // Hàm format tiền tệ (Lấy từ tableOrder.ejs)
-    formatPrice(price) {
-        const numericPrice = Number(price)
-
-        if (isNaN(numericPrice)) {
-            return '0 ₫'
-        }
-
-        const formatter = new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        })
-        return formatter.format(numericPrice)
-    }
-
-    // Hàm cập nhật trạng thái đơn hàng
     async updateOrderStatus() {
         if (!this.currentOrderId) return
 
@@ -168,7 +134,7 @@ class OrderModal {
             this.labelPhone.textContent = orderData.SDT
             this.labelAdresss.textContent = orderData.DiaChiNhan
             this.labelNote.textContent = orderData.GhiChu || 'Không có ghi chú'
-            this.labelDate.textContent = formatToVietNamTime(orderData.NgayDat)
+            this.labelDate.textContent = helpers.formatTime7(orderData.NgayDat)
 
             this.selectStatus.value = orderData.TrangThai
 
@@ -184,18 +150,18 @@ class OrderModal {
                     <tr>
                         <td>${detail.TenSach}</td>
                         <td class="text-end">${detail.SoLuong}</td>
-                        <td class="text-end">${this.formatPrice(
+                        <td class="text-end">${helpers.formatPrice(
                             detail.DonGia
                         )}</td>
                         
                         <td class="text-end"></td>
-                        <td class="text-end">${this.formatPrice(price)}</td>
+                        <td class="text-end">${helpers.formatPrice(price)}</td>
                     </tr>
                 `
             })
 
             this.tableDetails.innerHTML = html
-            this.totalPrice.textContent = this.formatPrice(totalAmount)
+            this.totalPrice.textContent = helpers.formatPrice(totalAmount)
 
             // Gắn chi tiết sách vào 1 biến
             this.bookItems = orderDetail

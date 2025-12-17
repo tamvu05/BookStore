@@ -9,34 +9,6 @@
         'COD': 'Thanh toán khi nhận hàng',
         'MOMO': 'Thanh toán qua momo',
     }
-
-    const getPrice = (price) => {
-        const numericPrice = Number(price);
-
-        if (isNaN(numericPrice)) {
-            return '0 ₫';
-        }
-
-        const formatter = new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-            minimumFractionDigits: 0, 
-        });
-
-        return formatter.format(numericPrice);
-    }
-
-    const getTime7 = (time) => {
-        return time.toLocaleString('vi-VN', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        })
-    }
 %>
 
 <div id="data-attribute"     data-current-page="<%= currentPage %>"     data-total-page="<%= totalPage %>"    
@@ -70,10 +42,10 @@
                             <%= order.SDT %>
                         </td>
                         <td class="text-muted">
-                            <%= getTime7(order.NgayDat) %>
+                            <%= formatTime7(order.NgayDat) %>
                         </td>
                         <td class="text-muted">
-                            <%= getPrice(order.TongTien) %> 
+                            <%= formatPrice(order.TongTien) %> 
                         </td>
                         <td class="text-muted">
                             <%= HINH_THUC_THANH_TOAN[order.HinhThucThanhToan] %> 

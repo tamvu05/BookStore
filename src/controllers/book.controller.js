@@ -5,6 +5,7 @@ import PublisherService from '../services/publisher.service.js'
 import { bookConfig } from '../configs/adminView.config.js'
 import { uploadImage } from '../utils/cloudinary.js'
 import exportFileExcel from '../utils/exportFileExcel.js'
+import { formatPrice } from '../utils/helpers.js'
 
 const BookController = {
     // --- PHẦN CHO USER (Giao diện khách hàng) ---
@@ -41,12 +42,7 @@ const BookController = {
             const limit = 12 // Số sách mỗi trang
 
             // 2. Gọi Service (Truyền đủ 4 tham số)
-            const data = await BookService.getAll(
-                page,
-                limit,
-                keyword,
-                categoryId
-            )
+            const data = await BookService.getAll(page, limit, keyword, categoryId)
 
             // 3. Render giao diện
             res.render('user/book', {
@@ -112,11 +108,11 @@ const BookController = {
                 tablePartial: bookConfig.tablePartial,
                 modalAddSelector: bookConfig.modalAddSelector,
                 modalAddPartial: bookConfig.modalAddPartial,
-                // modalUpdatePartial: bookConfig.modalUpdatePartial,
                 hrefBase: bookConfig.hrefBase,
                 apiBase: bookConfig.apiBase,
                 modalAddId: bookConfig.modalAddId,
                 modalUpdateId: bookConfig.modalUpdateId,
+                formatPrice,
             })
         } catch (err) {
             next(err)
@@ -152,17 +148,15 @@ const BookController = {
                 totalItem: data.totalItem,
                 totalItemPerPage: data.books.length,
                 PAGE_LIMIT: data.PAGE_LIMIT,
+                formatPrice,
             })
 
-            const pagination = await renderPartial(
-                'admin/partials/pagination',
-                {
-                    currentPage: data.currentPage,
-                    totalPage: data.totalPage,
-                    hrefBase: bookConfig.hrefBase,
-                    apiBase: bookConfig.apiBase,
-                }
-            )
+            const pagination = await renderPartial('admin/partials/pagination', {
+                currentPage: data.currentPage,
+                totalPage: data.totalPage,
+                hrefBase: bookConfig.hrefBase,
+                apiBase: bookConfig.apiBase,
+            })
 
             return res.json({
                 table,
@@ -281,14 +275,8 @@ const BookController = {
             const fileBuffer = exportFileExcel(excelData)
             const filename = 'DanhMucSach.xlsx'
 
-            res.setHeader(
-                'Content-Type',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
-            res.setHeader(
-                'Content-Disposition',
-                `attachment; filename="${filename}"`
-            )
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
             res.setHeader('Content-Length', fileBuffer.length)
 
             res.send(fileBuffer)

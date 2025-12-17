@@ -1,5 +1,6 @@
 import InvoiceService from '../services/invoice.service.js'
 import { invoiceConfig } from '../configs/adminView.config.js'
+import { formatPrice, formatTime7 } from '../utils/helpers.js'
 
 const InvoiceController = {
     // GET /admin/sale/invoice
@@ -7,7 +8,7 @@ const InvoiceController = {
         try {
             const query = req.query
             const data = await InvoiceService.getWithParam(query)
-            console.log(data.invoices);
+            console.log(data.invoices)
             res.render('admin/saleInvoice', {
                 invoices: data.invoices,
                 currentPage: data.currentPage,
@@ -20,11 +21,12 @@ const InvoiceController = {
                 tablePartial: invoiceConfig.tablePartial,
                 modalAddSelector: invoiceConfig.modalAddSelector,
                 modalAddPartial: invoiceConfig.modalAddPartial,
-                // modalUpdatePartial: invoiceConfig.modalUpdatePartial,
                 hrefBase: invoiceConfig.hrefBase,
                 apiBase: invoiceConfig.apiBase,
                 modalAddId: invoiceConfig.modalAddId,
                 modalUpdateId: invoiceConfig.modalUpdateId,
+                formatPrice,
+                formatTime7,
             })
         } catch (err) {
             next(err)
@@ -48,27 +50,23 @@ const InvoiceController = {
         try {
             const query = req.query
             const data = await InvoiceService.getWithParam(query)
-            const table = await renderPartial(
-                'admin/partials/invoice/tableInvoice',
-                {
-                    invoices: data.invoices,
-                    currentPage: data.currentPage,
-                    totalPage: data.totalPage,
-                    totalItem: data.totalItem,
-                    totalItemPerPage: data.invoices.length,
-                    PAGE_LIMIT: data.PAGE_LIMIT,
-                }
-            )
+            const table = await renderPartial('admin/partials/invoice/tableInvoice', {
+                invoices: data.invoices,
+                currentPage: data.currentPage,
+                totalPage: data.totalPage,
+                totalItem: data.totalItem,
+                totalItemPerPage: data.invoices.length,
+                PAGE_LIMIT: data.PAGE_LIMIT,
+                formatPrice,
+                formatTime7,
+            })
 
-            const pagination = await renderPartial(
-                'admin/partials/pagination',
-                {
-                    currentPage: data.currentPage,
-                    totalPage: data.totalPage,
-                    hrefBase: invoiceConfig.hrefBase,
-                    apiBase: invoiceConfig.apiBase,
-                }
-            )
+            const pagination = await renderPartial('admin/partials/pagination', {
+                currentPage: data.currentPage,
+                totalPage: data.totalPage,
+                hrefBase: invoiceConfig.hrefBase,
+                apiBase: invoiceConfig.apiBase,
+            })
 
             return res.json({
                 table,

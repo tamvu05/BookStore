@@ -30,7 +30,7 @@ router.get('/discount', isAdmin, (req, res) => res.json('comming soon'))
 router.get('/voucher', isAdmin, VoucherController.getViewManager)
 router.get('/employee', isAdmin, EmployeeController.getViewManager)
 router.get('/profile', (req, res, next) => {
-    res.json(req.session.account)
+    res.render('admin/profile.ejs')
 })
 
 router.get('/', (req, res, next) => {

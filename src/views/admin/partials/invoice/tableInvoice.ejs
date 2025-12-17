@@ -11,34 +11,6 @@
         'CASH': 'Thanh toán tiền mặt',
         'BANK_TRANSFER': 'Thanh toán ngân hàng'
     }
-
-    const getPrice = (price) => {
-        const numericPrice = Number(price);
-
-        if (isNaN(numericPrice)) {
-            return '0 ₫';
-        }
-
-        const formatter = new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-            minimumFractionDigits: 0, 
-        });
-
-        return formatter.format(numericPrice);
-    }
-
-    const getTime7 = (time) => {
-        return time.toLocaleString('vi-VN', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        })
-    }
 %>
 
 <div id="data-attribute"     data-current-page="<%= currentPage %>"     data-total-page="<%= totalPage %>"    
@@ -71,10 +43,10 @@
                             <%= invoice.SDT %>
                         </td>
                         <td class="text-muted">
-                            <%= getTime7(invoice.NgayTaoHoaDon) %>
+                            <%= formatTime7(invoice.NgayTaoHoaDon) %>
                         </td>
                         <td class="text-muted">
-                            <%= getPrice(invoice.TongTien) %> 
+                            <%= formatPrice(invoice.TongTien) %> 
                         </td>
                         <td class="text-muted">
                             <%= HINH_THUC_THANH_TOAN[invoice.HinhThucThanhToan] %> 

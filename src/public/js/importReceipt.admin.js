@@ -1,5 +1,5 @@
 import BaseTable from './base.table.js'
-import getCurrentVietNamTime from './getCurrentVietNamTime.js'
+import helpers from './helpers.js'
 
 class ImportReceiptFormModal {
     constructor(importReceiptTableInstance) {
@@ -91,7 +91,7 @@ class ImportReceiptFormModal {
     }
 
     initCurrentVNTime() {
-        this.inputDate.setAttribute('value', getCurrentVietNamTime())
+        this.inputDate.setAttribute('value', helpers.getCurTime7())
     }
 
     // --- LOGIC THAO TÁC CHI TIẾT SÁCH ---
@@ -344,7 +344,7 @@ class ImportReceiptFormModal {
 
     resetModal() {
         // Reset form inputs
-        this.inputDate.value = getCurrentVietNamTime()
+        this.inputDate.value = helpers.getCurTime7()
         this.textareaNotes.value = ''
         this.inputQuantity.value = 1
         this.inputUnitPrice.value = 0
@@ -580,12 +580,11 @@ class DetailModal {
                 throw new Error(errorMessage)
             }
 
-            this.labelDate.textContent = this.formatToVietNamTime(receipt.NgayNhap)
+            this.labelDate.textContent = helpers.formatTime7(receipt.NgayNhap)
             this.labelEmployee.textContent = receipt.HoTen
             this.labelSupplier.textContent = receipt.TenNCC
             this.labelNote.textContent = receipt.NoiDung
 
-            // Tạo nội dung table sách
             let html = ''
 
             let totalPrice = 0
@@ -596,18 +595,14 @@ class DetailModal {
                     <tr>
                         <td class="text-end">${detail.TenSach}</td>
                         <td class="text-end">${detail.SoLuong}</td>
-                        <td class="text-end">${detail.DonGiaNhap.toLocaleString(
-                            'vi-VN'
-                        )}</td>
-                        <td class="text-end">${price.toLocaleString(
-                            'vi-VN'
-                        )}</td>
+                        <td class="text-end">${helpers.formatPrice(detail.DonGiaNhap)}</td>
+                        <td class="text-end">${helpers.formatPrice(totalPrice)}</td>
                     </tr>
                 `
             })
 
             this.tableDetaile.innerHTML = html
-            this.totalPrice.textContent = totalPrice.toLocaleString('vi-VN')
+            this.totalPrice.textContent = helpers.formatPrice(totalPrice)
         } catch (error) {
             console.error('Lỗi khi hiển thị chi tiết phiếu nhập:', error)
             Swal.fire({
@@ -616,25 +611,6 @@ class DetailModal {
                 text: error.message,
             })
         }
-    }
-
-    formatToVietNamTime(dateInput) {
-        const dateObject = new Date(dateInput)
-
-        // Tùy chọn định dạng cho Việt Nam (UTC+7)
-        const options = {
-            timeZone: 'Asia/Ho_Chi_Minh', // Múi giờ chuẩn của Việt Nam
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false, // Đảm bảo định dạng 24 giờ
-        }
-
-        // Sử dụng locale 'vi-VN' và options để định dạng
-        return dateObject.toLocaleString('vi-VN', options)
     }
 }
 

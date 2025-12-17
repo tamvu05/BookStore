@@ -1,5 +1,6 @@
 import OrderService from '../services/order.service.js'
 import { orderConfig } from '../configs/adminView.config.js'
+import { formatPrice, formatTime7 } from '../utils/helpers.js'
 
 const OrderController = {
     // GET /order/history
@@ -30,15 +31,15 @@ const OrderController = {
         if (!data) return res.redirect('/order/history') // Không tìm thấy thì về lịch sử
 
         // 1. Tính Tạm tính (Cộng dồn tiền từng món sách)
-        const subTotal = data.items.reduce((sum, item) => sum + (item.DonGia * item.SoLuong), 0);
+        const subTotal = data.items.reduce((sum, item) => sum + item.DonGia * item.SoLuong, 0)
 
         // 2. Tính tiền Voucher đã giảm
         // Công thức: Giảm giá = Tạm tính - Tổng tiền thực trả (Trong DB)
         // (Lưu ý: Nếu sau này có phí ship thì: Voucher = Tạm tính + Ship - Tổng thực trả. Hiện tại Ship=0 nên đơn giản)
-        let discountAmount = subTotal - data.order.TongTien;
-        
+        let discountAmount = subTotal - data.order.TongTien
+
         // Xử lý lệch số lẻ (nếu có) để không ra số âm
-        if (discountAmount < 0) discountAmount = 0;
+        if (discountAmount < 0) discountAmount = 0
 
         res.render('user/order-detail', {
             title: 'Chi tiết đơn hàng #' + orderId,
@@ -46,7 +47,7 @@ const OrderController = {
             order: data.order, // Thông tin chung (Ngày, Người nhận...)
             items: data.items, // Danh sách sách
             subTotal: subTotal,
-            discountAmount: discountAmount
+            discountAmount: discountAmount,
         })
     },
 
@@ -67,11 +68,12 @@ const OrderController = {
                 tablePartial: orderConfig.tablePartial,
                 modalAddSelector: orderConfig.modalAddSelector,
                 modalAddPartial: orderConfig.modalAddPartial,
-                // modalUpdatePartial: orderConfig.modalUpdatePartial,
                 hrefBase: orderConfig.hrefBase,
                 apiBase: orderConfig.apiBase,
                 modalAddId: orderConfig.modalAddId,
                 modalUpdateId: orderConfig.modalUpdateId,
+                formatPrice,
+                formatTime7,
             })
         } catch (err) {
             next(err)
@@ -95,27 +97,23 @@ const OrderController = {
         try {
             const query = req.query
             const data = await OrderService.getWithParam(query)
-            const table = await renderPartial(
-                'admin/partials/order/tableOrder',
-                {
-                    orders: data.orders,
-                    currentPage: data.currentPage,
-                    totalPage: data.totalPage,
-                    totalItem: data.totalItem,
-                    totalItemPerPage: data.orders.length,
-                    PAGE_LIMIT: data.PAGE_LIMIT,
-                }
-            )
+            const table = await renderPartial('admin/partials/order/tableOrder', {
+                orders: data.orders,
+                currentPage: data.currentPage,
+                totalPage: data.totalPage,
+                totalItem: data.totalItem,
+                totalItemPerPage: data.orders.length,
+                PAGE_LIMIT: data.PAGE_LIMIT,
+                formatPrice,
+                formatTime7,
+            })
 
-            const pagination = await renderPartial(
-                'admin/partials/pagination',
-                {
-                    currentPage: data.currentPage,
-                    totalPage: data.totalPage,
-                    hrefBase: orderConfig.hrefBase,
-                    apiBase: orderConfig.apiBase,
-                }
-            )
+            const pagination = await renderPartial('admin/partials/pagination', {
+                currentPage: data.currentPage,
+                totalPage: data.totalPage,
+                hrefBase: orderConfig.hrefBase,
+                apiBase: orderConfig.apiBase,
+            })
 
             return res.json({
                 table,

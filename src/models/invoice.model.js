@@ -1,14 +1,7 @@
 import pool from '../configs/db.js'
 
 const InvoiceModel = {
-    async getWithParam(
-        limit,
-        offset,
-        sortBy = 'MaDH',
-        sortOrder = 'DESC',
-        keyword = '',
-        status = ''
-    ) {
+    async getWithParam(limit, offset, sortBy = 'MaDH', sortOrder = 'DESC', keyword = '', status = '') {
         const SDT = `%${keyword}%`
         const TrangThai = `%${status}%`
 
@@ -57,16 +50,7 @@ const InvoiceModel = {
         return rows
     },
 
-    async create({
-        TenNguoiNhan,
-        SDT,
-        DiaChiNhan,
-        NgayTao,
-        NoiDung,
-        ChiTietHD,
-        MaNV,
-        HinhThucThanhToan = 'CASH'
-    }) {
+    async create({ TenNguoiNhan, SDT, DiaChiNhan, NgayTao, NoiDung, ChiTietHD, MaNV, HinhThucThanhToan = 'CASH' }) {
         const connection = await pool.getConnection()
 
         try {
@@ -75,37 +59,26 @@ const InvoiceModel = {
             const [result] = await connection.query(
                 `INSERT INTO DonHang(MaNV, NgayTaoHoaDon, TenNguoiNhan , DiaChiNhan, SDT, GhiChu, HinhThucThanhToan, TrangThai, NgayDat) 
                 values (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [
-                    MaNV,
-                    NgayTao,
-                    TenNguoiNhan,
-                    DiaChiNhan,
-                    SDT,
-                    NoiDung,
-                    HinhThucThanhToan,
-                    'DA_BAN_TRUC_TIEP',
-                    null,
-                ]
+                [MaNV, NgayTao, TenNguoiNhan, DiaChiNhan, SDT, NoiDung, HinhThucThanhToan, 'DA_BAN_TRUC_TIEP', null]
             )
 
             const MaDH = result.insertId
+            let total = 0
 
             const detailPromise = ChiTietHD.map(async (chiTiet) => {
-                const insertCTPromise = connection.query(
-                    `INSERT INTO CTDonHang(MaDH, MaSach, SoLuong, DonGia) VALUES (?, ?, ?, ?)`,
-                    [MaDH, chiTiet.MaSach, chiTiet.SoLuong, chiTiet.DonGia]
-                )
+                const insertCTPromise = connection.query(`INSERT INTO CTDonHang(MaDH, MaSach, SoLuong, DonGia) VALUES (?, ?, ?, ?)`, [MaDH, chiTiet.MaSach, chiTiet.SoLuong, chiTiet.DonGia])
 
-                const updateSachPromise = connection.query(
-                    'UPDATE Sach SET SoLuongTon = SoLuongTon - ? WHERE MaSach = ?',
-                    [chiTiet.SoLuong, chiTiet.MaSach]
-                )
+                const updateSachPromise = connection.query('UPDATE Sach SET SoLuongTon = SoLuongTon - ? WHERE MaSach = ?', [chiTiet.SoLuong, chiTiet.MaSach])
+
+                total += Number(chiTiet.DonGia) * Number(chiTiet.SoLuong)
 
                 await Promise.all([insertCTPromise, updateSachPromise])
                 return true
             })
 
             await Promise.all(detailPromise)
+
+            await connection.query(`UPDATE DonHang SET TongTien = ? WHERE MaDH = ?`, [total, MaDH])
 
             await connection.commit()
 

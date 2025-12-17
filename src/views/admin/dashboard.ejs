@@ -1,126 +1,307 @@
 <%
-// Dữ liệu mẫu (Sample Data) - Trong ứng dụng thực tế, dữ liệu này sẽ được truyền từ Server (Node.js/Express)
 const stats = {
     totalBooks: 4520,
     totalAuthors: 580,
     totalCategories: 45,
     totalPublishers: 120,
-    newUsersToday: 15
+    totalOrders: 1250,
+    totalRevenue: 125400000,
+    newUsersToday: 15,
+    lowStockBooks: 23
 };
 
 const recentBooks = [
-    { title: "Lịch Sử Việt Nam Toàn Tập", author: "Trần Trọng Kim", dateAdded: "20/11/2025" },
-    { title: "Marketing Căn Bản", author: "Philip Kotler", dateAdded: "19/11/2025" },
-    { title: "Thuật Đắc Nhân Tâm", author: "Dale Carnegie", dateAdded: "18/11/2025" },
+    { title: "Lịch Sử Việt Nam Toàn Tập", author: "Trần Trọng Kim", price: 185000 },
+    { title: "Marketing Căn Bản", author: "Philip Kotler", price: 275000 },
+    { title: "Thuật Đắc Nhân Tâm", author: "Dale Carnegie", price: 95000 },
+    { title: "Thế Giới Phẳng", author: "Thomas Friedman", price: 165000 },
 ];
 
 const alerts = [
-    { type: "warning", message: "Cuốn 'Kiến trúc phần mềm' chỉ còn 10 bản tồn kho." },
-    { type: "info", message: "Có 5 yêu cầu đăng ký tác giả mới chờ duyệt." },
+    { type: "danger", icon: "fa-triangle-exclamation", message: "Cuốn 'Kiến trúc phần mềm' chỉ còn 5 bản tồn kho." },
+    { type: "warning", icon: "fa-clock", message: "Có 8 đơn hàng chưa được xác nhận." },
+    { type: "info", icon: "fa-info-circle", message: "Cập nhật hàng tuần vào thứ 2 hàng tuần." },
+];
+
+const quickActions = [
+    { label: "Quản lý Đơn hàng", href: "/admin/sale/order", icon: "fa-shopping-cart", color: "success" },
+    { label: "Báo cáo", href: "#", icon: "fa-chart-bar", color: "warning" },
 ];
 %>
 
-<h1 class="mb-4">🏠 HOME - Bảng Điều Khiển Tổng Quan</h1>
-<p class="text-muted">Chào mừng trở lại! Xem nhanh các chỉ số quan trọng của hệ thống.</p>
+<!-- Header Section -->
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h1 class="mb-2 fw-bold">
+            <i class="fas fa-th-large text-primary"></i> Bảng Điều Khiển
+        </h1>
+        <p class="text-muted mb-0">
+            <i class="fas fa-calendar-alt"></i>
+            <%= new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+        </p>
+    </div>
+    <div>
+        <button class="btn btn-outline-secondary me-2">
+            <i class="fas fa-sync-alt"></i> Làm mới
+        </button>
+    </div>
+</div>
 
-<hr>
+<!-- Main Statistics Section -->
+<div class="row g-4 mb-5">
+    <div class="col-lg-4 col-md-6">
+        <a href="#" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100 stat-card stat-primary">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted small mb-1">
+                                <i class="fas fa-book"></i> Tổng số Sách
+                            </p>
+                            <h3 class="mb-0 fw-bold text-primary"><%= stats.totalBooks.toLocaleString('vi-VN') %></h3>
+                            <small class="text-muted">Đầu sách hiện có</small>
+                        </div>
+                        <i class="fas fa-book-open fa-2x text-primary opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
 
-<section class="row mb-5">
-    <h2>📈 Thống Kê Chính</h2>
-    
-    <div class="col-lg-3 col-md-6 mb-4">
-        <div class="card bg-primary text-white shadow">
+    <div class="col-lg-4 col-md-6">
+        <a href="/admin/sale/invoice" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100 stat-card stat-success">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted small mb-1">
+                                <i class="fas fa-receipt"></i> Hóa đơn
+                            </p>
+                            <h3 class="mb-0 fw-bold text-success"><%= stats.totalOrders.toLocaleString('vi-VN') %></h3>
+                            <small class="text-muted">Tổng số hóa đơn</small>
+                        </div>
+                        <i class="fas fa-file-invoice-dollar fa-2x text-success opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm h-100 stat-card stat-warning">
             <div class="card-body">
-                <h5 class="card-title">Tổng số Sách</h5>
-                <p class="card-text fs-2 fw-bold"><%= stats.totalBooks %></p>
-                <small>Đầu sách hiện có</small>
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small mb-1">
+                            <i class="fas fa-dollar-sign"></i> Doanh thu
+                        </p>
+                        <h3 class="mb-0 fw-bold text-warning"><%= (stats.totalRevenue / 1000000).toFixed(1) %>M</h3>
+                        <small class="text-muted">Tháng này</small>
+                    </div>
+                    <i class="fas fa-chart-line fa-2x text-warning opacity-25"></i>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-lg-3 col-md-6 mb-4">
-        <div class="card bg-success text-white shadow">
-            <div class="card-body">
-                <h5 class="card-title">Tổng số Tác giả</h5>
-                <p class="card-text fs-2 fw-bold"><%= stats.totalAuthors %></p>
-                <small>Đã đăng ký</small>
-            </div>
+<!-- Quick Actions -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h5 class="mb-3">
+            <i class="fas fa-lightning-bolt text-warning"></i> Hành động nhanh
+        </h5>
+        <div class="row g-3">
+            <% quickActions.forEach(action => { %>
+                <div class="col-lg-3 col-md-6">
+                    <a href="<%= action.href %>" class="btn btn-outline-<%= action.color %> w-100 py-2 text-start">
+                        <i class="fas <%= action.icon %> me-2"></i> <%= action.label %>
+                    </a>
+                </div>
+            <% }); %>
         </div>
     </div>
+</div>
 
-    <div class="col-lg-3 col-md-6 mb-4">
-        <div class="card bg-info text-white shadow">
-            <div class="card-body">
-                <h5 class="card-title">Tổng số Thể loại</h5>
-                <p class="card-text fs-2 fw-bold"><%= stats.totalCategories %></p>
-                <small>Khác nhau</small>
+<!-- Content Grid -->
+<div class="row g-4">
+    <!-- Alerts & Warnings -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0">
+                    <i class="fas fa-bell text-danger"></i> Cảnh báo & Thông báo
+                </h5>
             </div>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-md-6 mb-4">
-        <div class="card bg-warning text-dark shadow">
-            <div class="card-body">
-                <h5 class="card-title">Người dùng mới (Hôm nay)</h5>
-                <p class="card-text fs-2 fw-bold"><%= stats.newUsersToday %></p>
-                <small>Cần xác nhận</small>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="row">
-    
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow">
-            <div class="card-header bg-danger text-white">
-                ⚠️ Cảnh báo & Công việc Cần làm
-            </div>
-            <ul class="list-group list-group-flush">
+            <div class="card-body p-0">
                 <% if (alerts.length > 0) { %>
-                    <% alerts.forEach(alert => { %>
-                        <li class="list-group-item list-group-item-<%= alert.type %>">
-                            <%= alert.message %>
-                            <a href="#" class="float-end btn btn-sm btn-outline-<%= (alert.type === 'warning' ? 'danger' : 'secondary') %>">Xử lý</a>
-                        </li>
-                    <% }); %>
+                    <div class="list-group list-group-flush">
+                        <% alerts.forEach((alert, index) => { %>
+                            <div class="list-group-item border-start-4 border-<%= alert.type %> ps-3">
+                                <div class="d-flex align-items-start justify-content-between">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <i class="fas <%= alert.icon %> text-<%= alert.type %>"></i>
+                                            <small class="text-muted text-uppercase fw-bold">
+                                                <% if(alert.type === 'danger') { %>Nguy hiểm<% } %>
+                                                <% if(alert.type === 'warning') { %>Cảnh báo<% } %>
+                                                <% if(alert.type === 'info') { %>Thông tin<% } %>
+                                            </small>
+                                        </div>
+                                        <p class="mb-0"><%= alert.message %></p>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Xóa">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
                 <% } else { %>
-                    <li class="list-group-item text-success">
-                        <i class="fas fa-check-circle"></i> Hệ thống ổn định. Không có cảnh báo.
-                    </li>
+                    <div class="text-center py-5">
+                        <i class="fas fa-check-circle text-success fa-2x mb-3"></i>
+                        <p class="text-muted">Hệ thống ổn định. Không có cảnh báo.</p>
+                    </div>
                 <% } %>
-            </ul>
+            </div>
         </div>
     </div>
 
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow">
-            <div class="card-header bg-secondary text-white">
-                📚 Sách Được Thêm Gần Đây
+    <!-- Recent Books -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0">
+                    <i class="fas fa-star text-warning"></i> Sách vừa thêm
+                </h5>
             </div>
-            <div class="card-body">
-                <table class="table table-sm">
-                    <thead>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th>Tên Sách</th>
+                            <th class="ps-3">Tên Sách</th>
                             <th>Tác Giả</th>
-                            <th>Ngày Thêm</th>
+                            <th class="text-end pe-3">Giá</th>
                         </tr>
                     </thead>
                     <tbody>
                         <% recentBooks.forEach(book => { %>
                             <tr>
-                                <td><%= book.title %></td>
-                                <td><%= book.author %></td>
-                                <td><%= book.dateAdded %></td>
+                                <td class="ps-3">
+                                    <small class="fw-bold"><%= book.title %></small>
+                                </td>
+                                <td><small><%= book.author %></small></td>
+                                <td class="text-end pe-3 fw-bold text-success">
+                                    <small><%= book.price.toLocaleString('vi-VN') %>₫</small>
+                                </td>
                             </tr>
                         <% }); %>
                     </tbody>
                 </table>
-                <a href="/admin/books" class="btn btn-sm btn-outline-primary float-end">Xem tất cả Sách</a>
+            </div>
+            <div class="card-footer bg-light">
+                <a href="/admin/book" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-arrow-right"></i> Xem tất cả sách
+                </a>
             </div>
         </div>
     </div>
-</section>
+</div>
+
+<!-- Secondary Stats -->
+<div class="row g-4 mt-2">
+    <div class="col-lg-3 col-md-6">
+        <a href="#" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted small mb-1">
+                                <i class="fas fa-users"></i> Tác giả
+                            </p>
+                            <h4 class="mb-0 fw-bold"><%= stats.totalAuthors %></h4>
+                        </div>
+                        <i class="fas fa-pen-fancy fa-2x text-info opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <a href="#" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted small mb-1">
+                                <i class="fas fa-layer-group"></i> Thể loại
+                            </p>
+                            <h4 class="mb-0 fw-bold"><%= stats.totalCategories %></h4>
+                        </div>
+                        <i class="fas fa-tag fa-2x text-info opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <a href="#" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted small mb-1">
+                                <i class="fas fa-building"></i> Nhà xuất bản
+                            </p>
+                            <h4 class="mb-0 fw-bold"><%= stats.totalPublishers %></h4>
+                        </div>
+                        <i class="fas fa-building fa-2x text-purple opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-0 shadow-sm border-start-4 border-danger stat-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small mb-1">
+                            <i class="fas fa-exclamation-triangle"></i> Hàng tồn thấp
+                        </p>
+                        <h4 class="mb-0 fw-bold text-danger"><%= stats.lowStockBooks %></h4>
+                    </div>
+                    <i class="fas fa-warehouse fa-2x text-danger opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stat-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .border-start-4 {
+        border-left: 4px solid;
+    }
+
+    .border-primary { border-color: #0d6efd; }
+    .border-success { border-color: #198754; }
+    .border-danger { border-color: #dc3545; }
+    .border-warning { border-color: #ffc107; }
+    .border-info { border-color: #0dcaf0; }
+
+    .text-purple { color: #6f42c1; }
+</style>
 
 

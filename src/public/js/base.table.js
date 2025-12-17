@@ -58,9 +58,7 @@ export default class BaseTable {
 
     // ---------- Core behaviors ----------
     getActiveSort() {
-        const sortableHeader = this.tableWrapper?.querySelector(
-            'tr i.sortable[data-order]'
-        )
+        const sortableHeader = this.tableWrapper?.querySelector('tr i.sortable[data-order]')
         if (!sortableHeader) return { sort: null, order: null }
         return {
             sort: sortableHeader.dataset.sort || null,
@@ -87,14 +85,7 @@ export default class BaseTable {
         return params.toString()
     }
 
-    async updateView(
-        page = 1,
-        sort,
-        order,
-        keyword,
-        shouldPushState = true,
-        shouldReplaceState = false
-    ) {
+    async updateView(page = 1, sort, order, keyword, shouldPushState = true, shouldReplaceState = false) {
         try {
             if (isNaN(page) || Number(page) < 1) page = 1
 
@@ -107,9 +98,7 @@ export default class BaseTable {
             const data = await res.json()
 
             if (!res.ok) {
-                throw new Error(
-                    data.message || data.error || `Lỗi không xác định: ${res.status}`
-                )
+                throw new Error(data.message || data.error || `Lỗi không xác định: ${res.status}`)
             }
 
             if (this.tableWrapper) this.tableWrapper.innerHTML = data.table
@@ -126,8 +115,7 @@ export default class BaseTable {
                 if (order) urlParams.set('order', order)
                 if (kw) urlParams.set('keyword', kw)
                 Object.entries(extra || {}).forEach(([k, v]) => {
-                    if (v !== undefined && v !== null && String(v).trim() !== '')
-                        urlParams.set(k, v)
+                    if (v !== undefined && v !== null && String(v).trim() !== '') urlParams.set(k, v)
                 })
                 currentUrl.search = urlParams.toString()
                 const urlString = currentUrl.toString()
@@ -179,12 +167,10 @@ export default class BaseTable {
             if (h !== currentHeader) h.removeAttribute('data-order')
         })
         const currentOrder = currentHeader.getAttribute('data-order')
-        const newOrder =
-            currentOrder === 'asc' ? 'desc' : currentOrder === 'desc' ? 'asc' : 'desc'
+        const newOrder = currentOrder === 'asc' ? 'desc' : currentOrder === 'desc' ? 'asc' : 'desc'
         currentHeader.setAttribute('data-order', newOrder)
 
-        const currentPage =
-            this.tableWrapper?.querySelector('#data-attribute')?.dataset?.currentPage || 1
+        const currentPage = this.tableWrapper?.querySelector('#data-attribute')?.dataset?.currentPage || 1
         const sort = currentHeader.dataset.sort
         const keyword = this.getKeywordFromInput()
         this.updateView(Number(currentPage), sort, newOrder, keyword)
@@ -209,8 +195,7 @@ export default class BaseTable {
     async exportExcel() {
         try {
             const res = await fetch(`${this.config.apiBaseUrl}/export`)
-            if (!res.ok)
-                throw new Error(`Lỗi HTTP ${res.status}: Không thể tải file.`)
+            if (!res.ok) throw new Error(`Lỗi HTTP ${res.status}: Không thể tải file.`)
 
             const blob = await res.blob()
             const url = window.URL.createObjectURL(blob)

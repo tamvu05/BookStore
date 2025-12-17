@@ -1,5 +1,5 @@
 import BaseTable from './base.table.js'
-import getCurrentVietNamTime from './getCurrentVietNamTime.js'
+import helpers from './helpers.js'
 
 class ExportReceiptFormModal {
     constructor(exportReceiptTableInstance) {
@@ -107,10 +107,9 @@ class ExportReceiptFormModal {
             throw new Error(errorMessage)
         }
 
-        this.inputDate.setAttribute('value', getCurrentVietNamTime())
+        this.inputDate.setAttribute('value', helpers.getCurTime7())
     }
 
-    // --- LOGIC THAO TÁC CHI TIẾT SÁCH (Giữ nguyên) ---
 
     handleItemAction(event) {
         const btnDelete = event.target.closest('.btn-remove-item')
@@ -241,14 +240,9 @@ class ExportReceiptFormModal {
             total += item.SoLuong * item.DonGia
         })
 
-        const formatter = new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-        })
-        this.totalAmountDisplay.textContent = formatter.format(total)
+        this.totalAmountDisplay.textContent = helpers.formatPrice(total)
     }
 
-    // --- LOGIC GỬI DỮ LIỆU VÀ VALIDATION FORM CHÍNH ---
     async createReceipt() {
         try {
             const ok = await this.validateForm()
@@ -390,13 +384,11 @@ class ExportReceiptFormModal {
 
     resetModal() {
         // Reset form inputs
-        this.inputDate.value = getCurrentVietNamTime()
+        this.inputDate.value = helpers.getCurTime7()
         this.textareaNotes.value = ''
         this.inputQuantity.value = 1
         this.inputUnitPrice.value = 0
 
-        // Reset Select2 fields
-        // ❌ Không cần selectSupplier
         $(this.selectEmployee).val(null).trigger('change')
         $(this.selectBookItem).val(null).trigger('change')
 
@@ -412,11 +404,10 @@ class ExportReceiptFormModal {
     }
 }
 
-// --- Class 2: ExportReceiptTable (Quản lý Bảng, Phân trang, Sự kiện) ---
 class ExportReceiptTable extends BaseTable {
     constructor() {
         super({
-            apiBaseUrl: '/api/export-receipt', // Endpoint đổi thành export-receipt
+            apiBaseUrl: '/api/export-receipt', 
             entityName: 'phiếu xuất hàng',
         })
         this.tableWrapper = document.querySelector('#table-view-manager')
@@ -432,7 +423,7 @@ class ExportReceiptTable extends BaseTable {
         this.sortableHeaders =
             this.tableWrapper?.querySelectorAll('tr .sortable')
 
-        this.exportDetailModalInstance = null // Đổi tên instance
+        this.exportDetailModalInstance = null 
 
         // No filters
         this.collectFilters = () => ({})
@@ -443,7 +434,6 @@ class ExportReceiptTable extends BaseTable {
     }
 
     loadInitialState() {
-        // Đổi placeholder cho phù hợp
         this.searchInput.setAttribute(
             'placeholder',
             'Tìm kiếm theo tên nhân viên'
@@ -578,9 +568,7 @@ class DetailModal {
                 throw new Error(errorMessage)
             }
 
-            this.labelDate.textContent = this.formatToVietNamTime(
-                receipt.NgayXuat
-            )
+            this.labelDate.textContent = helpers.formatTime7(receipt.NgayXuat)
             this.labelEmployee.textContent = receipt.HoTen
             this.labelNote.textContent = receipt.NoiDung
 
@@ -594,18 +582,14 @@ class DetailModal {
                     <tr>
                         <td class="text-end">${detail.TenSach}</td>
                         <td class="text-end">${detail.SoLuong}</td>
-                        <td class="text-end">${detail.DonGiaXuat.toLocaleString(
-                            'vi-VN'
-                        )}</td>
-                        <td class="text-end">${price.toLocaleString(
-                            'vi-VN'
-                        )}</td>
+                        <td class="text-end">${helpers.formatPrice(detail.DonGiaXuat)}</td>
+                        <td class="text-end">${helpers.formatPrice(price)}</td>
                     </tr>
                 `
             })
 
             this.tableDetaile.innerHTML = html
-            this.totalPrice.textContent = totalPrice.toLocaleString('vi-VN')
+            this.totalPrice.textContent = helpers.formatPrice(totalPrice)
         } catch (error) {
             console.error('Lỗi khi hiển thị chi tiết phiếu xuất:', error)
             Swal.fire({
