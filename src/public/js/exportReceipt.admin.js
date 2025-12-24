@@ -419,14 +419,24 @@ class ExportReceiptTable extends BaseTable {
         this.searchInput = document.querySelector(
             '.manager-container .search-value'
         )
+        this.statusFilter = document.querySelector('#receipt-status-filter')
         this.sortableHeaders =
             this.tableWrapper?.querySelectorAll('tr .sortable')
 
         this.exportDetailModalInstance = null 
 
-        // No filters
-        this.collectFilters = () => ({})
-        this.applyFiltersFromUrl = () => {}
+        // Collect filter values for status
+        this.collectFilters = () => ({
+            status: this.statusFilter?.value || null,
+        })
+
+        // Apply filters from URL
+        this.applyFiltersFromUrl = (urlParams) => {
+            if (this.statusFilter) {
+                const status = urlParams.get('status')
+                if (status) this.statusFilter.value = status
+            }
+        }
 
         this.loadInitialState()
         this.initEventListener()
@@ -448,6 +458,8 @@ class ExportReceiptTable extends BaseTable {
         if (this.searchInput && keyword) {
             this.searchInput.value = keyword
         }
+
+        this.applyFiltersFromUrl(urlParams)
 
         const currentPage = page ? Number(page) : 1
 
@@ -497,6 +509,11 @@ class ExportReceiptTable extends BaseTable {
                 'input',
                 this.debounced(() => this.handleSearch(), 1000)
             )
+        }
+
+        // Status filter
+        if (this.statusFilter) {
+            this.statusFilter.addEventListener('change', this.handleSearch.bind(this))
         }
     }
 

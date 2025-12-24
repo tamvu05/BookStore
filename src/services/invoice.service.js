@@ -1,5 +1,6 @@
 import config from '../configs/app.config.js'
 import InvoiceModel from '../models/invoice.model.js'
+import { createHttpError } from '../utils/errorUtil.js'
 
 const { PAGE_LIMIT } = config
 
@@ -22,18 +23,15 @@ const InvoiceService = {
 
         const offset = (currentPage - 1) * limit
 
-        const validParam = ['MaDH', 'NgayDat', 'ASC', 'asc', 'DESC', 'desc']
+        const validParam = ['MaHD', 'NgayTaoHoaDon', 'ASC', 'asc', 'DESC', 'desc']
         const validStatus = [
-            'CHO_XAC_NHAN',
-            'DANG_CHUAN_BI_HANG',
-            'DA_GIAO_CHO_DON_VI_VAN_CHUYEN',
-            'DA_GIAO',
+            'CHO_THANH_TOAN',
+            'DA_THANH_TOAN',
             'DA_HUY',
             'DA_HOAN_TRA',
-            'DA_BAN_TRUC_TIEP'
         ]
 
-        const sortBy = validParam.includes(sort) ? sort : 'MaDH'
+        const sortBy = validParam.includes(sort) ? sort : 'MaHD'
         const sortOrder = validParam.includes(order) ? order : 'DESC'
         status = validStatus.includes(status) ? status : ''
 
@@ -58,26 +56,26 @@ const InvoiceService = {
     },
 
     async getById(id) {
-        if (!id) throw new Error('Thiếu mã đơn hàng')
+        if (!id) throw new Error('Thiếu mã hóa đơn')
 
         const invoice = await InvoiceModel.getById(id)
-        if (!invoice) throw new Error('Đơn hàng không tồn tại')
+        if (!invoice) throw new Error('Hóa đơn không tồn tại')
 
         return invoice
     },
 
     async getDetailById(id) {
-        if (!id) throw new Error('Thiếu mã đơn hàng')
+        if (!id) throw new Error('Thiếu mã hóa đơn')
 
         const detail = await InvoiceModel.getDetailById(id)
-        if (!detail) throw new Error('Đơn hàng không tồn tại')
+        if (!detail) throw new Error('Hóa đơn không tồn tại')
 
         return detail
     },
 
     async create(payload) {
         try {
-            const { MaNV, NgayTao,  ChiTietHD} = payload
+            const { MaNV, NgayTao, ChiTietHD } = payload
 
             if (
                 !MaNV ||
@@ -89,11 +87,63 @@ const InvoiceService = {
             )
                 throw createHttpError('Thông tin hóa đơn không hợp lệ', 401)
 
-            if(!payload.SDT) payload.SDT = ''
+            if (!payload.SDTKhachHang) payload.SDTKhachHang = ''
 
             const insertId = await InvoiceModel.create(payload)
 
             return insertId
+        } catch (error) {
+            throw error
+        }
+    },
+
+    async pay(id) {
+        try {
+            if (!id) throw new Error('Thiếu mã hóa đơn')
+
+            const invoice = await InvoiceModel.getById(id)
+            if (!invoice) throw new Error('Hóa đơn không tồn tại')
+
+            if (invoice.TrangThai === 'DA_THANH_TOAN') {
+                throw new Error('Hóa đơn đã được thanh toán')
+            }
+
+            if (invoice.TrangThai === 'DA_HUY') {
+                throw new Error('Không thể thanh toán hóa đơn đã hủy')
+            }
+
+            if (invoice.TrangThai === 'DA_HOAN_TRA') {
+                throw new Error('Không thể thanh toán hóa đơn đã hoàn trả')
+            }
+
+            const success = await InvoiceModel.updateStatus(id, 'DA_THANH_TOAN')
+            if (!success) throw new Error('Không thể cập nhật trạng thái hóa đơn')
+
+            return true
+        } catch (error) {
+            throw error
+        }
+    },
+
+    async cancel(id) {
+        try {
+            if (!id) throw new Error('Thiếu mã hóa đơn')
+
+            const invoice = await InvoiceModel.getById(id)
+            if (!invoice) throw new Error('Hóa đơn không tồn tại')
+
+            if (invoice.TrangThai === 'DA_HUY') {
+                throw new Error('Hóa đơn đã được hủy')
+            }
+
+            if (invoice.TrangThai === 'DA_HOAN_TRA') {
+                throw new Error('Không thể hủy hóa đơn đã hoàn trả')
+            }
+
+            const success = await InvoiceModel.cancelInvoice(id)
+            if (!success) throw new Error('Không thể hủy hóa đơn')
+
+            return true
         } catch (error) {
             throw error
         }

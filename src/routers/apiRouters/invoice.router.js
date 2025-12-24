@@ -7,5 +7,7 @@ router.get('/partials', InvoiceController.getPartials)
 router.get('/detail/:id', InvoiceController.getDetailById)
 router.get('/:id', InvoiceController.getById)
 router.post('/', InvoiceController.create)
+router.patch('/:id/pay', InvoiceController.pay)
+router.patch('/:id/cancel', InvoiceController.cancel)
 
 export default router

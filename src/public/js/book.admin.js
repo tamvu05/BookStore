@@ -1,6 +1,22 @@
 // showToast replaced with Swal
 import BaseTable from './base.table.js'
 
+function formatPrice(price) {
+    const numericPrice = Number(price)
+
+    if (isNaN(numericPrice)) {
+        return '0 ₫'
+    }
+
+    const formatter = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    })
+    return formatter.format(numericPrice)
+}
+
 class BookFormModal {
     constructor(bookTableInstance) {
         this.bookTableInstance = bookTableInstance

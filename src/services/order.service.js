@@ -132,21 +132,6 @@ const OrderService = {
         ]
         TrangThai = isValid.includes(TrangThai) ? TrangThai : 'CHO_XAC_NHAN'
 
-        if (TrangThai === 'DA_GIAO') {
-            const vnTime = new Date().toLocaleString('sv-SE', {
-                timeZone: 'Asia/Ho_Chi_Minh',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-            })
-
-            const updateInvoiceDate = await OrderModel.updateInvoiceDate(id, vnTime)
-            if (!updateInvoiceDate) throw new Error('Cập nhật trạng thái đơn hàng thất bại')
-        }
-
         const result = await OrderModel.updateState(id, TrangThai)
 
         if (!result) throw new Error('Cập nhật trạng thái đơn hàng thất bại')
@@ -155,8 +140,14 @@ const OrderService = {
 
     async delete(id) {
         try {
-            // Kiểm tra trạng thái đơn hàng
-
+            // Kiểm tra trạng thái đơn hàng trước khi xóa
+            const order = await OrderModel.getById(id)
+            if (!order) throw new Error('Đơn hàng không tồn tại')
+            
+            const allowedStatuses = ['CHO_XAC_NHAN', 'DANG_CHUAN_BI_HANG']
+            if (!allowedStatuses.includes(order.TrangThai)) {
+                throw new Error(`Chỉ có thể xóa đơn hàng ở trạng thái Chờ xác nhận hoặc Đang chuẩn bị hàng`)
+            }
             
             const result = await OrderModel.delete(id)
             return result

@@ -10,7 +10,7 @@ const ImportReceiptController = {
             const query = req.query
             const account = req?.session?.account ?? {}
             const data = await ExportReceiptService.getWithParam(query, account)
-            res.render('admin/viewManager', {
+            res.render('admin/exportReceipt', {
                 exportReceipts: data.exportReceipts,
                 currentPage: data.currentPage,
                 totalPage: data.totalPage,

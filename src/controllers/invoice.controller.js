@@ -110,6 +110,28 @@ const InvoiceController = {
             next(err)
         }
     },
+
+    // PATCH /api/sale/invoice/:id/pay
+    async pay(req, res, next) {
+        try {
+            const { id } = req.params
+            await InvoiceService.pay(id)
+            res.json({ message: 'Thanh toán hóa đơn thành công' })
+        } catch (err) {
+            next(err)
+        }
+    },
+
+    // PATCH /api/sale/invoice/:id/cancel
+    async cancel(req, res, next) {
+        try {
+            const { id } = req.params
+            await InvoiceService.cancel(id)
+            res.json({ message: 'Hủy hóa đơn thành công' })
+        } catch (err) {
+            next(err)
+        }
+    },
 }
 
 export default InvoiceController

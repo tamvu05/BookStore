@@ -11,7 +11,7 @@ const statusMap = {
 const user = {
     fullName: account.TenNV || "N/A",
     email: account.Email || "N/A",
-    role: account.VaiTro ? (account.VaiTro === 1 ? "Quản trị viên" : account.VaiTro === 2 ? "Quản lý kho" : "Nhân viên") : "Không xác định",
+    role: account.VaiTro ? (account.VaiTro > 3 ? "Quản lý" : "Nhân viên") : "Không xác định",
     phone: account.SDT || "N/A",
     joinDate: account.NgayVaoLam ? new Date(account.NgayVaoLam).toLocaleDateString('vi-VN') : "N/A",
     employeeId: account.MaNV || "N/A",

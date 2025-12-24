@@ -1,7 +1,7 @@
 import pool from '../configs/db.js'
 
 const ImportReceiptModel = {
-    async getWithParam(limit, offset, sortBy = 'MaPN', sortOrder = 'DESC', keyword = '', MaNV = null) {
+    async getWithParam(limit, offset, sortBy = 'MaPN', sortOrder = 'DESC', keyword = '', MaNV = null, status = '') {
         const searchKeyword = `%${keyword}%`
         const conditions = ['TenNCC LIKE ?']
         const params = [searchKeyword]
@@ -9,6 +9,11 @@ const ImportReceiptModel = {
         if (MaNV) {
             conditions.push('PhieuNhap.MaNV = ?')
             params.push(MaNV)
+        }
+
+        if (status) {
+            conditions.push('PhieuNhap.TrangThai = ?')
+            params.push(status)
         }
 
         const whereClause = `WHERE ${conditions.join(' AND ')}`
@@ -24,7 +29,7 @@ const ImportReceiptModel = {
         return rows
     },
 
-    async getTotal(keyword = '', MaNV = null) {
+    async getTotal(keyword = '', MaNV = null, status = '') {
         const searchKeyword = `%${keyword}%`
         const conditions = ['TenNCC LIKE ?']
         const params = [searchKeyword]
@@ -32,6 +37,11 @@ const ImportReceiptModel = {
         if (MaNV) {
             conditions.push('PhieuNhap.MaNV = ?')
             params.push(MaNV)
+        }
+
+        if (status) {
+            conditions.push('PhieuNhap.TrangThai = ?')
+            params.push(status)
         }
 
         const whereClause = `WHERE ${conditions.join(' AND ')}`

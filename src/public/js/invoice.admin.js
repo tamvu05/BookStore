@@ -53,7 +53,7 @@ class InvoiceAddModal {
 
         this.inputName = this.modal.querySelector('#input-hoten')
         this.inputPhone = this.modal.querySelector('#input-sdt')
-        this.inputAddress = this.modal.querySelector('#input-diachi')
+        // Đã bỏ trường địa chỉ theo yêu cầu
 
         this.inputDate = this.modal.querySelector('#receipt-date-input')
         this.textareaNotes = this.modal.querySelector('#receipt-notes-textarea')
@@ -126,6 +126,34 @@ class InvoiceAddModal {
                 await this.loadBookSelect()
             })
         }
+
+        // Tự động điền đơn giá theo giá sách khi chọn (không cho sửa)
+        // Sử dụng select2:select event cho Select2
+        if (this.selectBookItem) {
+            $(this.selectBookItem).on('select2:select', (e) => {
+                const selectedOption = e.params.data.element
+                const price = Number(selectedOption?.dataset?.price || 0)
+                if (!isNaN(price) && price > 0) {
+                    this.inputUnitPrice.value = price
+                }
+                // Reset số lượng về 1 khi chọn sách mới
+                this.inputQuantity.value = 1
+            })
+        }
+
+        // Ngăn người dùng chỉnh sửa đơn giá
+        if (this.inputUnitPrice) {
+            this.inputUnitPrice.addEventListener('input', (e) => {
+                const selectedOption =
+                    this.selectBookItem.options[
+                        this.selectBookItem.selectedIndex
+                    ]
+                const price = Number(selectedOption?.dataset?.price || 0)
+                if (!isNaN(price) && price > 0) {
+                    this.inputUnitPrice.value = price
+                }
+            })
+        }
     }
 
     async loadBookSelect() {
@@ -179,14 +207,11 @@ class InvoiceAddModal {
                 value = Math.max(1, value)
                 inputElement.value = value
                 item.SoLuong = value
-            } else if (field === 'price') {
-                value = Math.max(0, value)
-                inputElement.value = value
-                item.DonGia = value
+                
+                this.selectedItems.set(itemId, item)
+                this.renderTotalAmount()
             }
-
-            this.selectedItems.set(itemId, item)
-            this.renderTotalAmount()
+            // Đơn giá không được phép chỉnh sửa
         }
     }
 
@@ -213,7 +238,7 @@ class InvoiceAddModal {
             row.innerHTML = `
                 <td>${item.TenSach}</td>
                 <td><input type="number" class="form-control form-control-sm text-end" value="${item.SoLuong}" min="1" data-field="quantity" data-id="${item.MaSach}"></td>
-                <td><input type="number" class="form-control form-control-sm text-end" value="${item.DonGia}" min="0" step="1000" data-field="price" data-id="${item.MaSach}"></td>
+                <td><input type="number" class="form-control form-control-sm text-end" value="${item.DonGia}" min="0" step="1000" data-field="price" data-id="${item.MaSach}" readonly></td>
                 <td class="text-center">
                     <button type="button" class="btn btn-sm btn-danger btn-remove-item" data-id="${item.MaSach}">
                         <i class="fas fa-times"></i>
@@ -247,7 +272,7 @@ class InvoiceAddModal {
             this.selectBookItem.options[this.selectBookItem.selectedIndex]
         const currentStock = Number(selectedOption?.dataset?.stock || 0)
 
-        if (!bookId || quantity <= 0 || unitPrice < 0) {
+        if (!bookId || quantity <= 0) {
             this.modal
                 .querySelector('.item-input-error')
                 .classList.remove('d-none')
@@ -312,14 +337,13 @@ class InvoiceAddModal {
             )
 
             const payload = {
-                TenNguoiNhan: this.inputName.value.trim() || 'Khách lẻ',
-                SDT: this.inputPhone.value.trim() || '',
-                DiaChiNhan: this.inputAddress.value.trim() || null,
+                TenKhachHang: this.inputName.value.trim() || 'Khách lẻ',
+                SDTKhachHang: this.inputPhone.value.trim() || '',
                 NgayTao: this.inputDate.value,
                 HinhThucThanhToan: this.paymentMethod.value,
-                NoiDung: this.textareaNotes.value.trim(),
+                GhiChu: this.textareaNotes.value.trim(),
                 ChiTietHD: ChiTietHD,
-                MaNV: 1, // Chỉnh sửa lại sau
+                MaNV: 1, // TODO: lấy từ session/nguồn phù hợp
             }
 
             Swal.fire({
@@ -434,7 +458,7 @@ class InvoiceAddModal {
                 const book = item[1]
                 if (
                     book.SoLuong <= 0 ||
-                    book.DonGia < 0 ||
+                    book.DonGia <= 0 ||
                     isNaN(book.SoLuong) ||
                     isNaN(book.DonGia)
                 ) {
@@ -478,7 +502,7 @@ class InvoiceAddModal {
 
         this.inputName.value = '' 
         this.inputPhone.value = ''
-        this.inputAddress.value = ''
+        // Bỏ reset địa chỉ vì không còn sử dụng
 
         // Reset Select2 fields
         $(this.selectBookItem).val(null).trigger('change')
@@ -504,20 +528,25 @@ class InvoiceViewModal {
         // Khu vực hiển thị thông tin chung
         this.labelName = this.modal.querySelector('#view-hoten')
         this.labelPhone = this.modal.querySelector('#view-sdt')
-        this.labelAdresss = this.modal.querySelector('#view-diachi')
+        // Đã bỏ hiển thị địa chỉ theo yêu cầu
         this.labelDate = this.modal.querySelector('#view-ngaydat')
         this.labelNote = this.modal.querySelector('#view-noidung') // Nếu có
 
         // Khu vực hiển thị Chi tiết
         this.tableDetails = this.modal.querySelector('#view-receipt-items-body')
-        this.voucherDisplay = this.modal.querySelector('#voucher')
         this.totalPrice = this.modal.querySelector('#view-total-amount')
 
         this.initEventListeners()
     }
 
     initEventListeners() {
-        // Hóa đơn là module tĩnh, không có nút save/update
+        // Reset data khi modal đóng
+        if (this.modal) {
+            this.modal.addEventListener(
+                'hidden.bs.modal',
+                this.resetModal.bind(this)
+            )
+        }
     }
 
     // Hàm nạp dữ liệu chi tiết và hiển thị modal
@@ -545,9 +574,8 @@ class InvoiceViewModal {
             }
 
             // --- 1. HIỂN THỊ THÔNG TIN KHÁCH HÀNG & PHIẾU ---
-            this.labelName.textContent = invoiceData.TenNguoiNhan
-            this.labelPhone.textContent = invoiceData.SDT
-            this.labelAdresss.textContent = invoiceData.DiaChiNhan
+            this.labelName.textContent = invoiceData.TenKhachHang || 'Khách lẻ'
+            this.labelPhone.textContent = invoiceData.SDTKhachHang || 'Không ghi nhận'
             this.labelDate.textContent = formatToVietNamTime(
                 invoiceData.NgayTaoHoaDon
             )
@@ -555,35 +583,24 @@ class InvoiceViewModal {
 
             // --- 2. HIỂN THỊ CHI TIẾT SÁCH TRONG BẢNG ---
             let html = ''
-            let totalAmount = 0
 
-            // Giả sử dữ liệu chi tiết có các trường: TenSach, SoLuong, DonGia, KhuyenMai, Voucher
+            // Dữ liệu chi tiết hóa đơn: TenSach, SoLuong, DonGia
             invoiceDetail.forEach((detail) => {
-                // Tính toán Thành tiền sau khi áp dụng Khuyến mãi
-                const discountFactor = 1 - (detail.KhuyenMai || 0) / 100
-                const lineTotal =
-                    detail.DonGia * detail.SoLuong * discountFactor
-
-                totalAmount += lineTotal
+                const lineTotal = detail.DonGia * detail.SoLuong
 
                 html += `
                     <tr>
                         <td>${detail.TenSach}</td>
                         <td class="text-end">${detail.SoLuong}</td>
-                        <td class="text-end">${this.formatPrice(
-                            detail.DonGia
-                        )}</td>
-                        <td class="text-end">${detail.KhuyenMai || 0}%</td>
+                        <td class="text-end">${this.formatPrice(detail.DonGia)}</td>
                         <td class="text-end">${this.formatPrice(lineTotal)}</td>
                     </tr>
                 `
             })
 
             this.tableDetails.innerHTML = html
-            this.totalPrice.textContent = this.formatPrice(totalAmount)
-            this.voucherDisplay.textContent = this.formatPrice(
-                invoiceData.GiaTriVoucher || 0
-            )
+            // Hiển thị tổng tiền theo hóa đơn từ DB
+            this.totalPrice.textContent = this.formatPrice(invoiceData.TongTien || 0)
         } catch (error) {
             console.error('Lỗi khi hiển thị chi tiết hóa đơn:', error)
             Swal.fire({
@@ -607,7 +624,13 @@ class InvoiceViewModal {
     }
 
     // Modal Hóa đơn không cần reset phức tạp
-    resetModal() {}
+    resetModal() {
+        this.labelName.textContent = ''
+        this.labelPhone.textContent = ''
+        this.labelDate.textContent = ''
+        this.tableDetails.innerHTML = ''
+        this.totalPrice.textContent = ''
+    }
 
     formatPrice(price) {
         // Áp dụng hàm formatPrice từ constructor
@@ -621,6 +644,7 @@ class InvoiceTable extends BaseTable {
             apiBaseUrl: '/api/sale/invoice',
             entityName: 'hóa đơn bán hàng',
         })
+        this.apiBaseUrl = '/api/sale/invoice'
         this.tableWrapper = document.querySelector('#table-view-manager')
         this.paginationWrapper = document.querySelector(
             '#pagination-view-manager'
@@ -631,13 +655,22 @@ class InvoiceTable extends BaseTable {
         this.searchInput = document.querySelector(
             '.manager-container .search-value'
         )
-        // Hóa đơn là static, thường không có bộ lọc trạng thái
+        this.statusFilter = document.querySelector('#invoice-status-filter')
 
         this.invoiceModalInstance = null
 
-        // No filters
-        this.collectFilters = () => ({})
-        this.applyFiltersFromUrl = () => {}
+        // Collect filter values for status
+        this.collectFilters = () => ({
+            status: this.statusFilter?.value || null,
+        })
+
+        // Apply filters from URL
+        this.applyFiltersFromUrl = (urlParams) => {
+            if (this.statusFilter) {
+                const status = urlParams.get('status')
+                if (status) this.statusFilter.value = status
+            }
+        }
 
         this.loadInitialState()
         this.initEventListeners()
@@ -652,13 +685,16 @@ class InvoiceTable extends BaseTable {
 
         const urlParams = new URLSearchParams(window.location.search)
 
-        // ... (Logic tải trạng thái tìm kiếm ban đầu) ...
-        const page = urlParams.get('page')
-        const keyword = urlParams.get('keyword')
-
-        if (this.searchInput && keyword) {
-            this.searchInput.value = keyword
+        if (this.searchInput) {
+            const keyword = urlParams.get('keyword')
+            if (keyword) this.searchInput.value = keyword
         }
+
+        this.applyFiltersFromUrl(urlParams)
+
+        const page = urlParams.get('page')
+        const status = urlParams.get('status')
+        const keyword = urlParams.get('keyword')
 
         const currentPage = page ? Number(page) : 1
 
@@ -670,12 +706,33 @@ class InvoiceTable extends BaseTable {
         if (this.tableWrapper)
             this.tableWrapper.addEventListener('click', (event) => {
                 const btnDetails = event.target.closest('.btn-show-details')
+                const btnPay = event.target.closest('.btn-pay')
+                const btnCancel = event.target.closest('.btn-cancel')
 
                 if (btnDetails) {
                     const id = btnDetails.closest('tr').dataset.id
                     this.invoiceModalInstance.showModal(id)
                 }
+
+                if (btnPay) {
+                    const row = btnPay.closest('tr')
+                    const id = row.dataset.id
+                    this.handlePayInvoice(id)
+                }
+
+                if (btnCancel) {
+                    const row = btnCancel.closest('tr')
+                    const id = row.dataset.id
+                    this.handleCancelInvoice(id)
+                }
             })
+
+        // Status filter change
+        if (this.statusFilter) {
+            this.statusFilter.addEventListener('change', () => {
+                this.handleSearch()
+            })
+        }
 
         // ... (Listeners Phân trang, Search, Popstate tương tự OrderTable) ...
         if (this.paginationWrapper) {
@@ -707,6 +764,102 @@ class InvoiceTable extends BaseTable {
 
     setInvoiceModalInstance(instance) {
         this.invoiceModalInstance = instance
+    }
+
+    async handlePayInvoice(id) {
+        const confirmed = await Swal.fire({
+            title: 'Xác nhận thanh toán?',
+            text: 'Hóa đơn sẽ được đánh dấu là đã thanh toán',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+        })
+
+        if (!confirmed.isConfirmed) return
+
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/${id}/pay`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json()
+                throw new Error(errorData.message || 'Không thể thanh toán hóa đơn')
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Đã thanh toán hóa đơn',
+                timer: 2000,
+                showConfirmButton: false,
+            })
+
+            // Reload current page
+            const urlParams = new URLSearchParams(window.location.search)
+            const currentPage = Number(urlParams.get('page')) || 1
+            this.updateView(currentPage)
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: error.message || 'Không thể thanh toán hóa đơn',
+            })
+        }
+    }
+
+    async handleCancelInvoice(id) {
+        const confirmed = await Swal.fire({
+            title: 'Xác nhận hủy hóa đơn?',
+            text: 'Hành động này sẽ hoàn trả tồn kho và không thể hoàn tác',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Xác nhận hủy',
+            cancelButtonText: 'Không',
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+        })
+
+        if (!confirmed.isConfirmed) return
+
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/${id}/cancel`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json()
+                throw new Error(errorData.message || 'Không thể hủy hóa đơn')
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Đã hủy hóa đơn',
+                timer: 2000,
+                showConfirmButton: false,
+            })
+
+            // Reload current page
+            const urlParams = new URLSearchParams(window.location.search)
+            const currentPage = Number(urlParams.get('page')) || 1
+            this.updateView(currentPage)
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: error.message || 'Không thể hủy hóa đơn',
+            })
+        }
     }
 
     // updateView, handlePageChange, handlePopState, handleSearch,

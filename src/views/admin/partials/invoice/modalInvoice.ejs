@@ -19,17 +19,14 @@
                                 <input type="text" class="form-control" id="input-hoten">
                             </div>
 
-                            <div class="mb-3">
-                                <label for="input-sdt" class="form-label">Số điện thoại</label>
-                                <input type="text" class="form-control" id="input-sdt">
-                                <div class="value-error d-none invalid-phone-number">Số điện thoại không hợp lệ!</div>
-                            </div>
+                            
                         </div>
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label for="input-diachi" class="form-label">Địa chỉ</label>
-                                <input type="text" class="form-control" id="input-diachi">
+                                <label for="input-sdt" class="form-label">Số điện thoại</label>
+                                <input type="text" class="form-control" id="input-sdt">
+                                <div class="value-error d-none invalid-phone-number">Số điện thoại không hợp lệ!</div>
                             </div>
                         </div>
                     </div>
@@ -73,7 +70,7 @@
                                 <div class="col-3">
                                     <label for="input-unit-price" class="form-label mb-0">Đơn giá </span></label>
                                     <input type="number" class="form-control text-end" id="input-unit-price" min="0"
-                                        value="0" step="1000">
+                                        value="0" step="1000" readonly>
                                 </div>
                                 <div class="col-1 d-flex justify-content-end">
                                     <button type="button" class="btn btn-success btn-add-item" title="Thêm mặt hàng">
@@ -81,8 +78,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="value-error d-none item-input-error mt-2">Vui lòng chọn sách, nhập số lượng và
-                                đơn giá!</div>
+                            <div class="value-error d-none item-input-error mt-2">Vui lòng chọn sách và nhập số lượng!</div>
                             <div class="value-error d-none out-of-stock-error mt-2">Số lượng sách xuất vượt quá số lượng
                                 tồn kho!</div>
                         </div>
@@ -145,7 +141,6 @@
 </div>
 
 
-
 <!-- Modal chi tiết -->
 <div class="modal fade" id="modal-view-invoice" tabindex="-1" aria-labelledby="modal-view-invoice-label"
     aria-hidden="true">
@@ -160,19 +155,19 @@
 
             <div class="modal-body">
                 <div class="row mb-4">
-                    <h5 class="mb-3 text-primary">Thông tin khách hàng</h5>
                     <div class="col-lg-6">
+                        <h5 class="mb-3 text-primary">Thông tin khách hàng</h5>
                         <p><strong>Họ tên:</strong> <span id="view-hoten"></span></p>
                         <p><strong>Số điện thoại:</strong> <span id="view-sdt"></span></p>
                     </div>
 
                     <div class="col-lg-6">
-                        <p><strong>Địa chỉ:</strong> <span id="view-diachi"></span></p>
+                        <h5 class="mb-3 text-primary">Ngày tạo hóa đơn</h5>
                         <p><strong>Ngày tạo:</strong> <span id="view-ngaydat"></span></p>
                     </div>
                 </div>
 
-                <h5 class="mb-3 text-primary mt-3">Danh sách mặt hàng đã bán</h5>
+                <h5 class="mb-3 text-primary mt-3">Danh sách mặt hàng</h5>
                 <div class="row">
                     <div class="col-12">
                         <div class="table-responsive">
@@ -180,10 +175,9 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>Sách</th>
-                                        <th>Số lượng</th>
-                                        <th>Đơn giá</th>
-                                        <th>Khuyến mãi</th>
-                                        <th>Thành tiền</th>
+                                        <th class="text-end" style="width: 15%;">Số lượng</th>
+                                        <th class="text-end" style="width: 20%;">Đơn giá</th>
+                                        <th class="text-end" style="width: 20%;">Thành tiền</th>
                                     </tr>
                                 </thead>
                                 <tbody id="view-receipt-items-body">
@@ -191,10 +185,7 @@
                                 </tbody>
                                 <tfoot>
                                     <tr class="table-primary">
-                                        <th colspan="1" class="text-end">Voucher</th>
-                                        <th id="voucher" class="text-end total-amount">0 đ</th>
-
-                                        <th colspan="2" class="text-end">Tổng tiền đơn đặt hàng</th>
+                                        <th colspan="3" class="text-end">Tổng tiền</th>
                                         <th id="view-total-amount" class="text-end total-amount"></th>
                                     </tr>
                                 </tfoot>

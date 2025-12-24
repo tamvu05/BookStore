@@ -71,6 +71,13 @@ table th, table td, .modal-body label {
     border: none;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     /* Bóng đổ rõ ràng hơn */
+    height: 100%;
+}
+
+.search-card .card-body {
+    display: flex;
+    align-items: center;
+    height: 100%;
 }
 
 .search-input-group .form-control {
@@ -90,6 +97,26 @@ table th, table td, .modal-body label {
 
 .search-button:hover {
     background-color: #5d36a3 !important;
+}
+
+/* Filter card */
+.filter-card {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    height: 100%;
+}
+
+.filter-card .card-body {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.filter-card .form-select {
+    border-radius: 8px;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
 }
 
 /* Điều chỉnh khoảng cách giữa các cột trong hàng hành động trên màn hình nhỏ */
@@ -207,7 +234,7 @@ table th, table td, .modal-body label {
 }
 
 .table .action-col {
-    width: 15%;
+    width: 20%;
 }
 
 /* --- ACTION BUTTON STYLES --- */
@@ -251,6 +278,18 @@ table th, table td, .modal-body label {
     background-color: #c0392b;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
+}
+
+.success-btn {
+    background-color: #27ae60;
+    /* Màu xanh lá (Green) */
+    color: white;
+}
+
+.success-btn:hover {
+    background-color: #229954;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(39, 174, 96, 0.4);
 }
 
 /* --- SORTABLE ICON STYLES (Giữ nguyên logic của bạn) --- */

@@ -13,7 +13,7 @@ const ImportReceiptController = {
             const data = await ImportReceiptService.getWithParam(query, account)
             const books = await BookService.getAllJSON()
             const suppliers = await SupplierService.getAll()
-            res.render('admin/viewManager', {
+            res.render('admin/importReceipt', {
                 importReceipts: data.importReceipts,
                 books,
                 suppliers,

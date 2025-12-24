@@ -7,7 +7,7 @@ const { PAGE_LIMIT } = config
 
 const ImportReceiptService = {
     async getWithParam(query, account = {}) {
-        let { page, sort, order, keyword } = query
+        let { page, sort, order, keyword, status } = query
         const { VaiTro, MaNV } = account || {}
 
         let currentPage = Number(page)
@@ -19,7 +19,10 @@ const ImportReceiptService = {
 
         const filterMaNV = Number(VaiTro) === 3 ? MaNV : null
 
-        const total = await ImportReceiptModel.getTotal(keyword, filterMaNV)
+        const validStatus = ['HIEU_LUC', 'DA_HUY']
+        status = validStatus.includes(status) ? status : ''
+
+        const total = await ImportReceiptModel.getTotal(keyword, filterMaNV, status)
         const totalPage = Math.ceil(total / limit)
 
         if (isNaN(currentPage) || currentPage > totalPage) currentPage = 1
@@ -38,7 +41,8 @@ const ImportReceiptService = {
             sortBy,
             sortOrder,
             keyword,
-            filterMaNV
+            filterMaNV,
+            status
         )
 
         return {

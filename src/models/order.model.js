@@ -8,7 +8,7 @@ const OrderModel = {
         const [rows] = await pool.query(
             `SELECT *
             FROM DonHang
-            WHERE SDT like ? AND TrangThai like ? AND TrangThai IN ('CHO_XAC_NHAN', 'DANG_CHUAN_BI_HANG', 'DA_GIAO_CHO_DON_VI_VAN_CHUYEN')
+            WHERE SDT like ? AND TrangThai like ?
             ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
             [SDT, TrangThai, limit, offset]
         )
@@ -20,7 +20,7 @@ const OrderModel = {
         const [result] = await pool.query(
             `SELECT COUNT(*) AS total
             FROM DonHang
-            WHERE SDT like ? AND TrangThai IN ('CHO_XAC_NHAN', 'DANG_CHUAN_BI_HANG', 'DA_GIAO_CHO_DON_VI_VAN_CHUYEN')`,
+            WHERE SDT like ?`,
             [SDT]
         )
         return result[0].total
@@ -49,13 +49,52 @@ const OrderModel = {
     },
 
     async updateState(id, TrangThai = 'CHO_XAC_NHAN') {
-        const [result] = await pool.query('UPDATE DonHang SET TrangThai = ? WHERE MaDH = ?', [TrangThai, id])
-        return result.affectedRows > 0
-    },
-
-    async updateInvoiceDate(id, date) {
-        const [result] = await pool.query('UPDATE DonHang SET NgayTaoHoaDon = ? WHERE MaDH = ?', [date, id])
-        return result.affectedRows > 0
+        const connection = await pool.getConnection()
+        try {
+            await connection.beginTransaction()
+            
+            // Update order status
+            const [result] = await connection.query(
+                'UPDATE DonHang SET TrangThai = ? WHERE MaDH = ?',
+                [TrangThai, id]
+            )
+            
+            // If status changes to 'DA_GIAO', create invoice automatically
+            if (TrangThai === 'DA_GIAO') {
+                const [order] = await connection.query(
+                    'SELECT MaDH, TenNguoiNhan, SDT, DiaChiNhan, TongTien, GhiChu FROM DonHang WHERE MaDH = ?',
+                    [id]
+                )
+                
+                if (order.length > 0) {
+                    const donHang = order[0]
+                    
+                    // Create invoice based on order info
+                    const [invoiceResult] = await connection.query(
+                        `INSERT INTO HoaDon (MaDH, NgayTaoHoaDon, TongTien, TenKhachHang, SDTKhachHang, GhiChu, HinhThucThanhToan, TrangThai)
+                        VALUES (?, NOW(), ?, ?, ?, ?, 'BANK_TRANSFER', 'CHO_THANH_TOAN')`,
+                        [donHang.MaDH, donHang.TongTien, donHang.TenNguoiNhan, donHang.SDT, donHang.GhiChu]
+                    )
+                    
+                    const MaHD = invoiceResult.insertId
+                    
+                    // Copy invoice details from order
+                    await connection.query(
+                        `INSERT INTO CTHoaDon (MaHD, MaSach, SoLuong, DonGia)
+                        SELECT ?, MaSach, SoLuong, DonGia FROM CTDonHang WHERE MaDH = ?`,
+                        [MaHD, id]
+                    )
+                }
+            }
+            
+            await connection.commit()
+            return result.affectedRows > 0
+        } catch (error) {
+            await connection.rollback()
+            throw error
+        } finally {
+            connection.release()
+        }
     },
 
     async delete(id) {

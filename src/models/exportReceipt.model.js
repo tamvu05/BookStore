@@ -7,7 +7,8 @@ const ExportReceiptModel = {
         sortBy = 'MaPX',
         sortOrder = 'DESC',
         keyword = '',
-        MaNV = null
+        MaNV = null,
+        status = ''
     ) {
         const searchKeyword = `%${keyword}%`
         const conditions = ['HoTen LIKE ?']
@@ -16,6 +17,11 @@ const ExportReceiptModel = {
         if (MaNV) {
             conditions.push('PhieuXuat.MaNV = ?')
             params.push(MaNV)
+        }
+
+        if (status) {
+            conditions.push('PhieuXuat.TrangThai = ?')
+            params.push(status)
         }
 
         const whereClause = `WHERE ${conditions.join(' AND ')}`
@@ -30,7 +36,7 @@ const ExportReceiptModel = {
         return rows
     },
 
-    async getTotal(keyword = '', MaNV = null) {
+    async getTotal(keyword = '', MaNV = null, status = '') {
         const searchKeyword = `%${keyword}%`
         const conditions = ['HoTen LIKE ?']
         const params = [searchKeyword]
@@ -38,6 +44,11 @@ const ExportReceiptModel = {
         if (MaNV) {
             conditions.push('PhieuXuat.MaNV = ?')
             params.push(MaNV)
+        }
+
+        if (status) {
+            conditions.push('PhieuXuat.TrangThai = ?')
+            params.push(status)
         }
 
         const whereClause = `WHERE ${conditions.join(' AND ')}`

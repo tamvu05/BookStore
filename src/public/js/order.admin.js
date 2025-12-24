@@ -138,6 +138,12 @@ class OrderModal {
 
             this.selectStatus.value = orderData.TrangThai
 
+            // Disable status update nếu đơn hàng đã giao hoặc đã hủy
+            const isDelivered = orderData.TrangThai === 'DA_GIAO'
+            const isCancelled = orderData.TrangThai === 'DA_HUY'
+            this.selectStatus.disabled = isDelivered || isCancelled
+            this.btnSave.disabled = isDelivered || isCancelled
+
             let html = ''
             let totalAmount = 0
 
@@ -189,7 +195,9 @@ class OrderModal {
 
     resetModal() {
         this.currentOrderId = null
-        // Có thể thêm logic reset input/label nếu cần
+        // Reset disabled state khi đóng modal
+        if (this.selectStatus) this.selectStatus.disabled = false
+        if (this.btnSave) this.btnSave.disabled = false
     }
 }
 
@@ -316,11 +324,13 @@ class OrderTable extends BaseTable {
             if (!result.isConfirmed) return
 
             const status = btnDelete.closest('tr').dataset.status
-            if (status === DANG_GIAO) {
+            const allowedStatusesForDelete = ['CHO_XAC_NHAN', 'DANG_CHUAN_BI_HANG']
+            
+            if (!allowedStatusesForDelete.includes(status)) {
                 Swal.fire({
                     icon: 'info',
                     title: 'Không thể xóa đơn hàng!',
-                    text: 'Đơn hàng đang được vận chuyển!',
+                    text: 'Chỉ có thể xóa đơn hàng ở trạng thái Chờ xác nhận hoặc Đang chuẩn bị hàng.',
                 })
                 return
             }

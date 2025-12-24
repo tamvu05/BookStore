@@ -1,13 +1,12 @@
 <% 
     const TRANG_THAI = {
-        'CHO_XAC_NHAN': 'Chờ xác nhận',
-        'DANG_CHUAN_BI_HANG': 'Đang chuẩn bị hàng',
-        'DA_GIAO_CHO_DON_VI_VAN_CHUYEN': 'Đã giao cho đơn vị vận chuyển'
+        'CHO_THANH_TOAN': 'Chờ thanh toán',
+        'DA_THANH_TOAN': 'Đã thanh toán',
+        'DA_HUY': 'Đã hủy',
+        'DA_HOAN_TRA': 'Đã hoàn trả'
     }
 
     const HINH_THUC_THANH_TOAN = {
-        'COD': 'Thanh toán khi nhận hàng',
-        'MOMO': 'Thanh toán qua momo',
         'CASH': 'Thanh toán tiền mặt',
         'BANK_TRANSFER': 'Thanh toán ngân hàng'
     }
@@ -21,11 +20,12 @@
     <table class="table table-striped table-hover align-middle">
         <thead>
             <tr>
-                <th>Mã đơn</th>
+                <th>Mã HĐ</th>
                 <th>Số điện thoại</th>
                 <th>Ngày tạo</th>
                 <th>Tổng tiền</th>
                 <th>Hình thức thanh toán</th>
+                <th>Trạng thái</th>
                 <th class="text-center">Thao tác</th>
             </tr>
         </thead>
@@ -35,12 +35,12 @@
 
                 <% invoices.forEach((invoice)=> { %>
 
-                    <tr data-id="<%= invoice.MaDH %>" data-status="<%= invoice.TrangThai %>">
+                    <tr data-id="<%= invoice.MaHD %>" data-status="<%= invoice.TrangThai %>">
                         <td>
-                            <%= invoice.MaDH %>
+                            <%= invoice.MaHD %>
                         </td>
                         <td>
-                            <%= invoice.SDT %>
+                            <%= invoice.SDTKhachHang || 'Không ghi nhận' %>
                         </td>
                         <td class="text-muted">
                             <%= formatTime7(invoice.NgayTaoHoaDon) %>
@@ -51,17 +51,40 @@
                         <td class="text-muted">
                             <%= HINH_THUC_THANH_TOAN[invoice.HinhThucThanhToan] %> 
                         </td>
+                        <td>
+                            <% if (invoice.TrangThai === 'DA_THANH_TOAN') { %>
+                                <span class="badge bg-success">Đã thanh toán</span>
+                            <% } else if (invoice.TrangThai === 'CHO_THANH_TOAN') { %>
+                                <span class="badge bg-warning">Chờ thanh toán</span>
+                            <% } else if (invoice.TrangThai === 'DA_HUY') { %>
+                                <span class="badge bg-danger">Đã hủy</span>
+                            <% } else if (invoice.TrangThai === 'DA_HOAN_TRA') { %>
+                                <span class="badge bg-secondary">Đã hoàn trả</span>
+                            <% } %>
+                        </td>
                         <td class="action-col text-center">
                             <button class="btn-show-details btn action-btn view-btn" title="Xem chi tiết">
                                 <i class="fa-solid fa-eye"></i> 
                             </button>
+                            
+                            <% if (invoice.TrangThai === 'CHO_THANH_TOAN') { %>
+                                <button class="btn-pay btn action-btn success-btn" title="Thanh toán">
+                                    <i class="fa-solid fa-money-bill"></i>
+                                </button>
+                            <% } %>
+                            
+                            <% if (invoice.TrangThai === 'CHO_THANH_TOAN' || invoice.TrangThai === 'DA_THANH_TOAN') { %>
+                                <button class="btn-cancel btn action-btn delete-btn" title="Hủy">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            <% } %>
                         </td>
                     </tr>
                     <% }) %>
                         <% } else { %>
 
                             <tr class="no-data">
-                                <td colspan="6" class="text-center py-4">
+                                <td colspan="7" class="text-center py-4">
                                     Không có dữ liệu...
                                 </td>
                             </tr>

@@ -22,7 +22,7 @@ const EmployeeModel = {
 
     async getById(id) {
         const [rows] = await pool.query(
-            `SELECT MaNV, HoTen as TenNV, SDT, NgaySinh, NgayVaoLam, TrangThai, TenDangNhap as Email  
+            `SELECT MaNV, HoTen as TenNV, SDT, NgaySinh, NgayVaoLam, TrangThai, TenDangNhap as Email, VaiTro, NgaySinh, NgayVaoLam
             FROM NhanVien JOIN TaiKhoan on NhanVien.MaTK = TaiKhoan.MaTK
             WHERE MaNV = ?`,
             [id]
