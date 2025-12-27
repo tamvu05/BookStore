@@ -169,6 +169,25 @@ const OrderController = {
             next(error)
         }
     },
-}
 
-export default OrderController
+    // API Hủy đơn
+    async cancelOrder(req, res) {
+        try {
+            if (!req.session.user) {
+                return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập' });
+            }
+
+            const customerId = req.session.user.customerId;
+            const { orderId } = req.body; // Nhận ID đơn hàng từ nút bấm
+
+            const result = await OrderService.cancelOrder(orderId, customerId);
+            
+            res.json(result); // Trả về { success: true }
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+};
+
+export default OrderController;

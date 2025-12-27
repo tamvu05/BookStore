@@ -155,6 +155,58 @@ const OrderService = {
             throw error
         }
     },
-}
 
-export default OrderService
+    // 2. HỦY ĐƠN HÀNG & HOÀN KHO (Logic quan trọng)
+    async cancelOrder(orderId, customerId) {
+        let connection;
+        try {
+            connection = await pool.getConnection();
+            await connection.beginTransaction();
+
+            // B1: Kiểm tra xem đơn này có đúng là của khách này và đang "Chờ xác nhận" không?
+            const [order] = await connection.query(
+                `SELECT TrangThai FROM DonHang WHERE MaDH = ? AND MaKH = ?`, 
+                [orderId, customerId]
+            );
+
+            if (order.length === 0) {
+                throw new Error('Đơn hàng không tồn tại hoặc không phải của bạn!');
+            }
+
+            if (order[0].TrangThai !== 'CHO_XAC_NHAN') {
+                throw new Error('Chỉ có thể hủy đơn hàng khi đang chờ xác nhận!');
+            }
+
+            // B2: Cập nhật trạng thái thành 'DA_HUY'
+            await connection.query(
+                `UPDATE DonHang SET TrangThai = 'DA_HUY' WHERE MaDH = ?`, 
+                [orderId]
+            );
+
+            // B3: Lấy danh sách sách trong đơn để cộng lại vào kho
+            const [items] = await connection.query(
+                `SELECT MaSach, SoLuong FROM CTDonHang WHERE MaDH = ?`,
+                [orderId]
+            );
+
+            // B4: Hoàn trả số lượng tồn kho
+            for (const item of items) {
+                await connection.query(
+                    `UPDATE Sach SET SoLuongTon = SoLuongTon + ? WHERE MaSach = ?`,
+                    [item.SoLuong, item.MaSach]
+                );
+            }
+
+            await connection.commit();
+            return { success: true, message: 'Đã hủy đơn hàng thành công!' };
+
+        } catch (error) {
+            if (connection) await connection.rollback();
+            throw error;
+        } finally {
+            if (connection) connection.release();
+        }
+    }
+};
+
+export default OrderService;

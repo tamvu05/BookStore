@@ -15,4 +15,7 @@ router.get('/history', OrderController.history);
 // Đường dẫn xem chi tiết đơn hàng
 router.get('/detail/:id', OrderController.detail);
 
+// API Hủy đơn
+router.post('/cancel', OrderController.cancelOrder);
+
 export default router;
