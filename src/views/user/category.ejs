@@ -16,7 +16,22 @@
 
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3" id="categoryList">
         <% if (categories && categories.length > 0) { %>
-            <% categories.forEach((cat, index) => { %>
+            <% categories.forEach((cat, index) => { 
+                /* --- LOGIC CHỌN ICON MỚI --- */
+                let iconClass = 'bi-bookmarks'; // Icon mặc định
+                const name = cat.TenTL.toLowerCase();
+
+                if (name.includes('tiểu thuyết')) { iconClass = 'bi-book-half'; }
+                else if (name.includes('kinh tế') || name.includes('quản trị')) { iconClass = 'bi-graph-up-arrow'; }
+                else if (name.includes('kỹ năng')) { iconClass = 'bi-lightning-charge'; }
+                else if (name.includes('trinh thám') || name.includes('kinh dị')) { iconClass = 'bi-eye'; }
+                else if (name.includes('công nghệ') || name.includes('lập trình')) { iconClass = 'bi-laptop'; }
+                else if (name.includes('tâm lý')) { iconClass = 'bi-puzzle'; }
+                else if (name.includes('ngoại ngữ') || name.includes('tiếng')) { iconClass = 'bi-translate'; }
+                else if (name.includes('thiếu nhi')) { iconClass = 'bi-emoji-smile'; }
+                else if (name.includes('lịch sử') || name.includes('địa lý')) { iconClass = 'bi-globe-americas'; }
+                else if (name.includes('tản văn') || name.includes('thơ')) { iconClass = 'bi-feather'; }
+            %>
                 <div class="col category-item">
                     <a href="/book?categoryId=<%= cat.MaTL %>" class="text-decoration-none text-dark">
                         <div class="card h-100 border-0 shadow-sm hover-card p-3">
@@ -27,15 +42,7 @@
                                        (index % 4 === 2 ? 'bg-warning bg-opacity-10 text-warning' : 'bg-danger bg-opacity-10 text-danger')) %>" 
                                     style="width: 45px; height: 45px; font-size: 1.2rem;">
                                     
-                                    <% if (cat.TenTL.toLowerCase().includes('tiểu thuyết')) { %>
-                                        <i class="bi bi-book"></i>
-                                    <% } else if (cat.TenTL.toLowerCase().includes('kinh tế')) { %>
-                                        <i class="bi bi-graph-up-arrow"></i>
-                                    <% } else if (cat.TenTL.toLowerCase().includes('kỹ năng')) { %>
-                                        <i class="bi bi-lightning-charge"></i>
-                                    <% } else { %>
-                                        <i class="bi bi-bookmarks"></i>
-                                    <% } %>
+                                    <i class="bi <%= iconClass %>"></i>
                                 </div>
 
                                 <div class="flex-grow-1 overflow-hidden">
