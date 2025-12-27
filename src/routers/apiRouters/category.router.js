@@ -1,18 +1,19 @@
 import express from 'express'
 import CategoryController from '../../controllers/category.controller.js'
+import { checkLoginAdmin, isAdmin } from '../../middlewares/auth.middleware.js'
 
 const router = express.Router()
 
-router.get('/partials', CategoryController.getPartials)
+router.get('/partials', checkLoginAdmin, CategoryController.getPartials)
 
-router.get('/export', CategoryController.export)
+router.get('/export', checkLoginAdmin, isAdmin, CategoryController.export)
 
-router.get('/:id', CategoryController.getById)
+router.get('/:id', checkLoginAdmin, CategoryController.getById)
 
-router.post('/', CategoryController.create)
+router.post('/', checkLoginAdmin, isAdmin, CategoryController.create)
 
-router.put('/:id', CategoryController.update)
+router.put('/:id', checkLoginAdmin, isAdmin, CategoryController.update)
 
-router.delete('/:id', CategoryController.delete)
+router.delete('/:id', checkLoginAdmin, isAdmin, CategoryController.delete)
 
 export default router

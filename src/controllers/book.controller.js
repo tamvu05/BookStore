@@ -148,6 +148,7 @@ const BookController = {
                 totalItemPerPage: data.books.length,
                 PAGE_LIMIT: data.PAGE_LIMIT,
                 formatPrice,
+                isManager: res.locals.isManager,
             })
 
             const pagination = await renderPartial('admin/partials/pagination', {

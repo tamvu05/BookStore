@@ -22,10 +22,9 @@
         <thead>
             <tr>
                 <th>Mã đơn</th>
-                <th>Số điện thoại</th>
+                <th>Điện thoại</th>
                 <th>Ngày đặt</th>
                 <th>Tổng tiền</th>
-                <th>Hình thức thanh toán</th>
                 <th>Trạng thái</th>
                 <th class="text-center">Thao tác</th>
             </tr>
@@ -50,10 +49,19 @@
                             <%= formatPrice(order.TongTien) %> 
                         </td>
                         <td class="text-muted">
-                            <%= HINH_THUC_THANH_TOAN[order.HinhThucThanhToan] %> 
-                        </td>
-                        <td class="text-muted">
-                            <%= TRANG_THAI[order.TrangThai] %> 
+                            <% if (order.TrangThai === 'CHO_XAC_NHAN') { %>
+                                <span class="badge bg-warning text-white">Chờ xác nhận</span>
+                            <% } else if (order.TrangThai === 'CHO_THANH_TOAN') { %>
+                                    <span class="badge bg-warning text-white">Chờ thanh toán</span>
+                            <% } else if (order.TrangThai === 'DANG_CHUAN_BI_HANG') { %>
+                                <span class="badge bg-info">Đang chuẩn bị</span>
+                            <% } else if (order.TrangThai === 'DA_GIAO_CHO_DON_VI_VAN_CHUYEN') { %>
+                                <span class="badge bg-info">Đang giao</span>
+                            <% } else if (order.TrangThai === 'DA_GIAO') { %>
+                                <span class="badge bg-success">Đã giao</span>
+                            <% } else if (order.TrangThai === 'DA_HUY') { %>
+                                <span class="badge bg-secondary">Đã hủy</span>
+                            <% } %>
                         </td>
                         <td class="action-col text-center">
                             <button class="btn-show-details btn action-btn edit-btn" title="Cập nhật">

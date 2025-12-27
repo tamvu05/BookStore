@@ -2,25 +2,26 @@ import express from 'express'
 import BookController from '../../controllers/book.controller.js'
 import { createUploadMiddleware } from '../../middlewares/upload.js';
 import { bookConfig } from '../../configs/adminView.config.js';
+import { checkLoginAdmin, isAdmin } from '../../middlewares/auth.middleware.js'
 
 const router = express.Router()
 
-router.get('/', BookController.getAll)
+router.get('/', checkLoginAdmin, BookController.getAll)
 
-router.get('/partials', BookController.getPartials)
+router.get('/partials', checkLoginAdmin, BookController.getPartials)
 
-router.get('/export', BookController.export)
+router.get('/export', checkLoginAdmin, isAdmin, BookController.export)
 
-router.get('/quantity/:id', BookController.getQuantity)
+router.get('/quantity/:id', checkLoginAdmin, BookController.getQuantity)
 
-router.get('/:id', BookController.getById)
+router.get('/:id', checkLoginAdmin, BookController.getById)
 
-router.post('/', createUploadMiddleware('HinhAnh'), BookController.create);
+router.post('/', checkLoginAdmin, isAdmin, createUploadMiddleware('HinhAnh'), BookController.create);
 
-router.put('/:id', createUploadMiddleware('HinhAnh'), BookController.update);
+router.put('/:id', checkLoginAdmin, isAdmin, createUploadMiddleware('HinhAnh'), BookController.update);
 
-router.delete('/:id', BookController.delete);
+router.delete('/:id', checkLoginAdmin, isAdmin, BookController.delete);
 
-router.patch('/:id/stock', BookController.updateStock);
+router.patch('/:id/stock', checkLoginAdmin, isAdmin, BookController.updateStock);
 
 export default router

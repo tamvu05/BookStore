@@ -13,10 +13,10 @@
         <thead>
             <tr>
                 <th>STT</th>
-                <th>Ngày nhập</th>
-                <th><i class="sortable" data-sort="TenNCC">Nhà cung cấp</i></th>
-                <th>Điện thoại</th>
                 <th>Nhân viên lập phiếu</th>
+                <th>Nhà cung cấp</th>
+                <th>Ngày nhập</th>
+                <th>Điện thoại</th>
                 <th>Trạng thái</th>
                 <th class="text-center">Thao tác</th>
             </tr>
@@ -31,6 +31,12 @@
                         <td>
                             <%= index + 1 %>
                         </td>
+                         <td class="text-muted">
+                            <%= importReceipt.HoTen %> 
+                        </td>
+                        <td class="text-muted">
+                            <%= importReceipt.TenNCC %>
+                        </td>
                         <td class="text-muted">
                             <%= importReceipt.NgayNhap.toLocaleString('vi-VN', {
                                 year: 'numeric',
@@ -38,19 +44,14 @@
                                 day: '2-digit',
                                 hour: '2-digit',
                                 minute: '2-digit',
-                                second: '2-digit',
                                 hour12: false // Bật 24 giờ
                             }) %>
                         </td>
-                        <td class="text-muted">
-                            <%= importReceipt.TenNCC %>
-                        </td>
+                        
                         <td class="text-muted">
                             <%= importReceipt.SDT %>
                         </td>
-                        <td class="text-muted">
-                            <%= importReceipt.HoTen %> 
-                        </td>
+                       
                         <td>
                             <% if (importReceipt.TrangThai === 'HIEU_LUC') { %>
                                 <span class="badge bg-success">Có hiệu lực</span>

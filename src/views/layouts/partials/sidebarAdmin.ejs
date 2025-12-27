@@ -44,6 +44,7 @@
             </li>
 
 
+            <% if (isManager) { %>
             <li class="nav-item">
                 <a class="nav-link dropdown-toggle collapsed" data-bs-toggle="collapse" data-bs-target="#inventorySubMenu"
                     aria-expanded="false" aria-controls="inventorySubMenu">
@@ -72,6 +73,7 @@
                     </ul>
                 </div>
             </li>
+            <% } %>
 
 
             <li class="nav-item">
@@ -98,7 +100,7 @@
                 </div>
             </li>
 
-            <% if (true) { %>
+            <% if (isManager) { %>
             <li class="nav-item">
                 <a class="nav-link dropdown-toggle collapsed" data-bs-toggle="collapse" data-bs-target="#promotion-submenu"
                     aria-expanded="false" aria-controls="promotion-submenu">
@@ -125,7 +127,7 @@
             <% } %>
 
 
-            <% if (true) { %>
+            <% if (isManager) { %>
             <li class="nav-item">
                 <a href="/admin/employee">
                     <i class="fas fa-user-tie"></i> <span>Quản lý nhân viên</span>
@@ -266,7 +268,6 @@
         position: absolute;
         right: 20px;
         margin-right: 0 !important;
-        transition: transform 0.3s ease;
         /* Thay đổi kích thước icon mũi tên nếu cần */
         font-size: 0.85rem;
     }
@@ -332,7 +333,119 @@
         color: #ecf0f1;
         border-left-color: transparent;
     }
+
+    /* Active page highlight */
+    .sidebar-menu a.active-page {
+        background-color: #34495e;
+        color: #ffffff;
+        border-left-color: #3498db;
+        font-weight: 600;
+    }
+
+    .sidebar-menu .submenu .nav-item a.active-page {
+        background-color: #34495e;
+        color: #ffffff;
+        border-left: 3px solid #3498db;
+    }
 </style>
 
+<script>
+(function() {
+    const STORAGE_KEY = 'admin_sidebar_state';
+    const currentPath = window.location.pathname;
 
-<!-- locals?.account?.VaiTro > 2 -->
+    // Khôi phục trạng thái ngay lập tức (trước khi trang render)
+    try {
+        const savedState = localStorage.getItem(STORAGE_KEY);
+        if (savedState) {
+            const expandedMenus = JSON.parse(savedState);
+            // Inject CSS để mở các menu đã lưu
+            const style = document.createElement('style');
+            const rules = expandedMenus.map(id => `#${id} { display: block !important; }`).join('\n');
+            style.textContent = rules;
+            document.head.appendChild(style);
+            
+            // Sau khi DOM load, cập nhật class và aria
+            document.addEventListener('DOMContentLoaded', function() {
+                expandedMenus.forEach(menuId => {
+                    const menu = document.getElementById(menuId);
+                    if (menu) {
+                        menu.classList.add('show');
+                        const toggle = document.querySelector(`[data-bs-target="#${menuId}"]`);
+                        if (toggle) {
+                            toggle.classList.remove('collapsed');
+                            toggle.setAttribute('aria-expanded', 'true');
+                        }
+                    }
+                });
+                // Xóa style tạm
+                setTimeout(() => style.remove(), 100);
+            });
+        }
+    } catch (e) {
+        console.error('Sidebar state restore error:', e);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lưu trạng thái khi toggle
+        function saveState() {
+            const expanded = [];
+            document.querySelectorAll('.sidebar-menu .collapse.show').forEach(el => {
+                expanded.push(el.id);
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(expanded));
+        }
+
+        // Đánh dấu trang hiện tại
+        function highlightCurrentPage() {
+            let bestMatch = null;
+            let bestLength = 0;
+
+            document.querySelectorAll('.sidebar-menu a[href]').forEach(link => {
+                const href = link.getAttribute('href');
+                
+                // Skip logout
+                if (href.includes('logout')) return;
+                
+                // Exact match
+                if (href === currentPath) {
+                    bestMatch = link;
+                    bestLength = href.length;
+                }
+                // Prefix match (chọn match dài nhất)
+                else if (href !== '/' && href !== '/admin' && 
+                         currentPath.startsWith(href) && 
+                         href.length > bestLength) {
+                    bestMatch = link;
+                    bestLength = href.length;
+                }
+            });
+
+            if (bestMatch) {
+                bestMatch.classList.add('active-page');
+                
+                // Mở menu cha nếu item nằm trong submenu
+                const parentSubmenu = bestMatch.closest('.submenu');
+                if (parentSubmenu && !parentSubmenu.classList.contains('show')) {
+                    parentSubmenu.classList.add('show');
+                    const toggle = document.querySelector(`[data-bs-target="#${parentSubmenu.id}"]`);
+                    if (toggle) {
+                        toggle.classList.remove('collapsed');
+                        toggle.setAttribute('aria-expanded', 'true');
+                    }
+                    // Cập nhật localStorage
+                    saveState();
+                }
+            }
+        }
+
+        // Lắng nghe sự kiện collapse
+        document.querySelectorAll('.sidebar-menu .collapse').forEach(collapse => {
+            collapse.addEventListener('shown.bs.collapse', saveState);
+            collapse.addEventListener('hidden.bs.collapse', saveState);
+        });
+
+        highlightCurrentPage();
+    });
+})();
+</script>

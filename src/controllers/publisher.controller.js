@@ -63,6 +63,7 @@ const PublisherController = {
                     totalItem: data.totalItem,
                     totalItemPerPage: data.publishers.length,
                     PAGE_LIMIT: data.PAGE_LIMIT,
+                    isManager: res.locals.isManager,
                 }
             )
 

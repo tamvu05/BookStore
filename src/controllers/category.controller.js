@@ -90,6 +90,7 @@ const CategoryController = {
                     totalItem:  data.totalItem,
                     totalItemPerPage: data.categories.length,
                     PAGE_LIMIT: data.PAGE_LIMIT,
+                    isManager: res.locals.isManager,
                 }
             )
 

@@ -11,7 +11,6 @@ function formatToVietNamTime(dateInput) {
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit',
         hour12: false,
     }
     return dateObject.toLocaleString('vi-VN', options)
@@ -238,7 +237,7 @@ class InvoiceAddModal {
             row.innerHTML = `
                 <td>${item.TenSach}</td>
                 <td><input type="number" class="form-control form-control-sm text-end" value="${item.SoLuong}" min="1" data-field="quantity" data-id="${item.MaSach}"></td>
-                <td><input type="number" class="form-control form-control-sm text-end" value="${item.DonGia}" min="0" step="1000" data-field="price" data-id="${item.MaSach}" readonly></td>
+                <td><input type="number" class="form-control form-control-sm text-end bg-light" value="${item.DonGia}" min="0" step="1000" data-field="price" data-id="${item.MaSach}" readonly style="cursor: not-allowed;"></td>
                 <td class="text-center">
                     <button type="button" class="btn btn-sm btn-danger btn-remove-item" data-id="${item.MaSach}">
                         <i class="fas fa-times"></i>

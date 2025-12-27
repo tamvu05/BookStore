@@ -20,10 +20,12 @@
 
         <div class="col-lg-6 col-md-6 col-12 d-flex justify-content-end action-buttons-row">
             <div class="me-3">
+                <% if (isManager) { %>
                 <button type="button" class="btn btn-add-primary" data-bs-toggle="modal"
                     data-bs-target="<%= modalAddSelector %>">
                     <i class="fas fa-plus"></i> Thêm <%= entityName %>
                 </button>
+                <% } %>
             </div>
 
             <div>

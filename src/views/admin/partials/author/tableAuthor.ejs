@@ -11,7 +11,9 @@
                     <i class="sortable" data-sort="TenTG">Tên tác giả</i>
                 </th>
                 <th>Mô tả</th>
+                <% if (isManager) { %>
                 <th class="text-center">Thao tác</th>
+                <% } %>
             </tr>
         </thead>
         <tbody>
@@ -30,6 +32,7 @@
                         <td class="desc font-weight-bold">
                             <%= author.MoTa %>
                         </td>
+                        <% if (isManager) { %>
                         <td class="action-col text-center">
                             <button class="btn-show-modal-update btn action-btn edit-btn" title="Chỉnh sửa">
                                 <i class="fa-regular fa-pen-to-square"></i>
@@ -38,13 +41,14 @@
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>
+                        <% } %>
                     </tr>
                     <% }) %>
 
                         <% } else { %>
 
                             <tr class="no-data">
-                                <td colspan="4" class="text-center py-4">
+                                <td colspan="<%= isManager ? 4 : 3 %>" class="text-center py-4">
                                     Không có dữ liệu...
                                 </td>
                             </tr>

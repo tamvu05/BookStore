@@ -55,7 +55,13 @@
                             <%= employee.Email %>
                         </td>
                         <td class="desc text-muted">
-                            <%= TRANG_THAI[employee.TrangThai] %>
+                            <% if (employee.TrangThai === 'ACTIVE') { %>
+                                <span class="badge bg-success">Hoạt động</span>
+                            <% } else if (employee.TrangThai === 'LOCKED') { %>
+                                <span class="badge bg-secondary">Đã khóa</span>
+                            <% } else { %>
+                                <span class="badge bg-secondary"><%= TRANG_THAI[employee.TrangThai] %></span>
+                            <% } %>
                         </td>
                         <td class="action-col text-center">
                             <button class="btn-show-modal-update btn action-btn edit-btn" title="Chỉnh sửa">

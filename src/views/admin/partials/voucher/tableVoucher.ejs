@@ -61,7 +61,17 @@
                             <%= voucher.SoLuong - voucher.SLDaDung %>
                         </td>
                         <td class="desc text-muted">
-                            <%= TRANG_THAI[voucher.TrangThai] %>
+                            <% if (voucher.TrangThai === 'HOAT_DONG') { %>
+                                <span class="badge bg-success">Hoạt động</span>
+                            <% } else if (voucher.TrangThai === 'QUA_HAN') { %>
+                                <span class="badge bg-warning text-dark">Đã quá hạn</span>
+                            <% } else if (voucher.TrangThai === 'HET_SO_LUONG') { %>
+                                <span class="badge bg-warning text-dark">Đã hết số lượng</span>
+                            <% } else if (voucher.TrangThai === 'VO_HIEU') { %>
+                                <span class="badge bg-secondary">Vô hiệu</span>
+                            <% } else { %>
+                                <span class="badge bg-secondary"><%= TRANG_THAI[voucher.TrangThai] %></span>
+                            <% } %>
                         </td>
                         <td class="action-col text-center">
                             <button class="btn-show-modal-update btn action-btn edit-btn" title="Chỉnh sửa">

@@ -1,5 +1,6 @@
 import pool from '../configs/db.js';
 import CartService from './cart.service.js';
+import { getCurrentVietNamTime } from '../utils/helpers.js';
 
 const CheckoutService = {
     // 1. Hàm phụ: Kiểm tra và tính tiền giảm giá
@@ -96,11 +97,14 @@ const CheckoutService = {
             connection = await pool.getConnection();
             await connection.beginTransaction();
 
+            // Lấy thời gian Việt Nam hiện tại
+            const vnTime = getCurrentVietNamTime();
+
             // Lưu Đơn hàng
             const [orderResult] = await connection.query(
                 `INSERT INTO DonHang (MaKH, NgayDat, TongTien, TenNguoiNhan, DiaChiNhan, SDT, GhiChu, TrangThai, MaVC) 
-                VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?)`, // Chỗ này thay string cứng bằng biến ?
-                [customerId, finalTotal, nguoiNhan, diaChi, sdt, ghiChu, initialStatus, voucherCode || null] 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [customerId, vnTime, finalTotal, nguoiNhan, diaChi, sdt, ghiChu, initialStatus, voucherCode || null] 
             );
             const orderId = orderResult.insertId;
 

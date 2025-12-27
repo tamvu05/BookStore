@@ -72,7 +72,7 @@ const OrderModel = {
                     // Create invoice based on order info
                     const [invoiceResult] = await connection.query(
                         `INSERT INTO HoaDon (MaDH, NgayTaoHoaDon, TongTien, TenKhachHang, SDTKhachHang, GhiChu, HinhThucThanhToan, TrangThai)
-                        VALUES (?, NOW(), ?, ?, ?, ?, 'BANK_TRANSFER', 'CHO_THANH_TOAN')`,
+                        VALUES (?, NOW(), ?, ?, ?, ?, 'BANK_TRANSFER', 'DA_THANH_TOAN')`,
                         [donHang.MaDH, donHang.TongTien, donHang.TenNguoiNhan, donHang.SDT, donHang.GhiChu]
                     )
                     

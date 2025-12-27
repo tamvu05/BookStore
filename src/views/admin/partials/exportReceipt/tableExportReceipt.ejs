@@ -13,8 +13,8 @@
         <thead>
             <tr>
                 <th>STT</th>
-                <th>Ngày xuất hàng</th>
-                <th><i class="sortable" data-sort="TenNCC">Tên nhân viên</i></th>
+                <th>Nhân viên lập phiếu</th>
+                <th>Ngày xuất</th>
                 <th>Nội dung</th>
                 <th>Trạng thái</th>
                 <th class="text-center">Thao tác</th>
@@ -31,18 +31,17 @@
                             <%= index + 1 %>
                         </td>
                         <td class="text-muted">
+                            <%= exportReceipt.HoTen %> 
+                        </td>
+                        <td class="text-muted">
                             <%= exportReceipt.NgayXuat.toLocaleString('vi-VN', {
                                 year: 'numeric',
                                 month: '2-digit',
                                 day: '2-digit',
                                 hour: '2-digit',
                                 minute: '2-digit',
-                                second: '2-digit',
                                 hour12: false 
                             }) %>
-                        </td>
-                        <td class="text-muted">
-                            <%= exportReceipt.HoTen %> 
                         </td>
                         <td class="text-muted">
                             <%= exportReceipt.NoiDung %> 

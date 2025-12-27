@@ -4,8 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. CẤU HÌNH TOAST (Thông báo nhỏ ở góc)
     const Toast = Swal.mixin({
         toast: true,
-        position: 'top-end', // Hiện ở góc trên phải
+        position: 'bottom-start', // Hiện ở góc dưới trái
         showConfirmButton: false,
+        showCloseButton: true, // Thêm nút đóng
         timer: 3000, // Tự tắt sau 3 giây
         timerProgressBar: true,
         didOpen: (toast) => {

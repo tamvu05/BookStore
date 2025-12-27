@@ -63,6 +63,7 @@ const AuthorController = {
                     totalItem: data.totalItem,
                     totalItemPerPage: data.authors.length,
                     PAGE_LIMIT: data.PAGE_LIMIT,
+                    isManager: res.locals.isManager,
                 }
             )
 

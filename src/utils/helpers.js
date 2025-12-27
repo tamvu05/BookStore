@@ -24,10 +24,24 @@ const formatTime7 = (time) => {
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit',
         hour12: false,
     }
     return dateObject.toLocaleString('vi-VN', options)
 }
 
-export { formatPrice, formatTime7 }
+const getCurrentVietNamTime = () => {
+    const vnTime = new Date().toLocaleString('sv-SE', {
+        timeZone: 'Asia/Ho_Chi_Minh',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+    })
+
+    return vnTime.replace(' ', 'T')
+}
+
+export { formatPrice, formatTime7, getCurrentVietNamTime }
