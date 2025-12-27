@@ -1,15 +1,29 @@
 // src/public/js/cart.js
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. CẤU HÌNH TOAST (Thông báo nhỏ ở góc)
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end', // Hiện ở góc trên phải
+        showConfirmButton: false,
+        timer: 3000, // Tự tắt sau 3 giây
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    });
+
     // Tìm tất cả nút "Thêm vào giỏ"
     const addToCartButtons = document.querySelectorAll('.btn-add-cart');
-    const cartBadge = document.querySelector('.bi-cart-fill').nextElementSibling; // Tìm cái số màu đỏ cạnh icon giỏ hàng
+    const cartBadge = document.querySelector('.bi-cart-fill')?.nextElementSibling;
 
+    // --- XỬ LÝ THÊM VÀO GIỎ ---
     addToCartButtons.forEach(btn => {
         btn.addEventListener('click', async (e) => {
-            e.preventDefault(); // Chặn việc load lại trang hoặc nhảy link
+            e.preventDefault(); 
             
-            // Hiệu ứng bấm nút (cho người dùng biết là đã bấm)
+            // Hiệu ứng loading cho nút
             const originalContent = btn.innerHTML;
             btn.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
             btn.disabled = true;
@@ -19,37 +33,57 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const response = await fetch('/cart/add', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ bookId })
                 });
 
                 const result = await response.json();
 
                 if (response.ok) {
-                    // 1. Cập nhật số lượng trên Header
+                    // Cập nhật số lượng trên Header
                     if (cartBadge) {
                         cartBadge.innerText = result.totalQuantity;
-                        // Hiệu ứng rung lắc badge cho vui mắt
                         cartBadge.classList.add('animate-bounce');
                         setTimeout(() => cartBadge.classList.remove('animate-bounce'), 1000);
                     }
 
-                    // 2. Thông báo thành công (Dùng alert tạm, sau này dùng Toast đẹp hơn)
-                    alert('✅ Đã thêm vào giỏ hàng!');
+                    // ✅ THAY ALERT BẰNG TOAST THÀNH CÔNG
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Đã thêm vào giỏ hàng!'
+                    });
+
                 } else {
-                    // Nếu chưa đăng nhập thì chuyển sang trang login
+                    // Nếu chưa đăng nhập: Hiện Popup hỏi đăng nhập
                     if (response.status === 401) {
-                        alert('Vui lòng đăng nhập để mua hàng!');
-                        window.location.href = '/login';
+                        Swal.fire({
+                            title: 'Bạn chưa đăng nhập',
+                            text: "Vui lòng đăng nhập để tiếp tục mua sắm!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#0d6efd',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Đăng nhập ngay',
+                            cancelButtonText: 'Để sau'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/login';
+                            }
+                        });
                     } else {
-                        alert('❌ Lỗi: ' + result.message);
+                        // Lỗi khác: Hiện Toast lỗi
+                        Toast.fire({
+                            icon: 'error',
+                            title: result.message || 'Có lỗi xảy ra'
+                        });
                     }
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Lỗi kết nối server!');
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Lỗi kết nối server!'
+                });
             } finally {
                 // Trả lại trạng thái cũ cho nút
                 btn.innerHTML = originalContent;
@@ -58,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 1. Nút Tăng/Giảm
+    // --- XỬ LÝ TĂNG/GIẢM SỐ LƯỢNG ---
     const updateQuantity = async (btn, change) => {
         const row = btn.closest('tr');
         const bookId = row.getAttribute('data-book-id');
@@ -81,33 +115,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 input.value = newQty;
                 
                 // 2. Tính lại Thành tiền của dòng đó
-                // Lấy giá gốc từ data-price của tr (nếu chưa có thì phải thêm vào ejs: <tr data-price="<%= item.DonGia %>">)
-                // Hoặc lấy từ data-total chia số lượng cũ (hơi rủi ro). Tốt nhất EJS thêm data-price vào <tr>
-                // Giả sử EJS đã thêm data-price vào <tr> như code trên
+                // (Giả sử row có attribute data-price chứa giá gốc)
                 const price = parseFloat(row.getAttribute('data-price')) || 0;
                 const newTotal = price * newQty;
                 
-                // Cập nhật text hiển thị
-                row.querySelector('.cart-total-display').innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(newTotal);
+                // Cập nhật text hiển thị thành tiền
+                const totalDisplay = row.querySelector('.cart-total-display');
+                if(totalDisplay) {
+                    totalDisplay.innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(newTotal);
+                }
 
-                // 👇 CẬP NHẬT DATA CHO CHECKBOX ĐỂ HÀM TÍNH TỔNG BIẾT
+                // Cập nhật data cho checkbox (để tính tổng tiền khi chọn)
                 const checkbox = row.querySelector('.item-checkbox');
                 if (checkbox) {
                     checkbox.setAttribute('data-total', newTotal);
                 }
 
-                // 👇 GỌI HÀM TÍNH LẠI TỔNG (Hàm này nằm bên file ejs)
+                // Gọi hàm tính lại Tổng cộng (Hàm này nằm bên file cart.ejs)
                 if (typeof window.updateCartSelection === 'function') {
                     window.updateCartSelection();
                 }
 
-                // Cập nhật icon giỏ hàng
+                // Cập nhật icon giỏ hàng trên header
                 if (result.totalQty !== undefined && cartBadge) {
                     cartBadge.innerText = result.totalQty;
                 }
             }
         } catch (error) {
             console.error(error);
+            Toast.fire({ icon: 'error', title: 'Không thể cập nhật số lượng' });
         }
     };
 
@@ -119,31 +155,55 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => updateQuantity(btn, -1));
     });
 
-    // 2. Nút Xóa 
+    // --- XỬ LÝ XÓA SẢN PHẨM ---
     document.querySelectorAll('.btn-remove-cart').forEach(btn => {
         btn.addEventListener('click', async function() {
-            if (!confirm('Bạn có chắc muốn xóa sách này?')) return;
+            // ✅ Thay confirm mặc định bằng Swal Popup đẹp hơn
+            const confirmResult = await Swal.fire({
+                title: 'Xóa sách này?',
+                text: "Bạn có chắc muốn xóa sản phẩm khỏi giỏ hàng?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa luôn',
+                cancelButtonText: 'Giữ lại'
+            });
+
+            if (!confirmResult.isConfirmed) return;
 
             const row = this.closest('tr');
             const bookId = row.getAttribute('data-book-id');
 
-            const response = await fetch('/cart/remove', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bookId })
-            });
+            try {
+                const response = await fetch('/cart/remove', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bookId })
+                });
 
-            const result = await response.json();
-            if (result.success) {
-                row.remove(); 
-                
-                // 👇 GỌI HÀM TÍNH LẠI TỔNG
-                if (typeof window.updateCartSelection === 'function') {
-                    window.updateCartSelection();
+                const result = await response.json();
+                if (result.success) {
+                    row.remove(); // Xóa dòng HTML
+                    
+                    // Gọi hàm tính lại Tổng cộng
+                    if (typeof window.updateCartSelection === 'function') {
+                        window.updateCartSelection();
+                    }
+
+                    if (cartBadge) cartBadge.innerText = result.totalQty;
+                    
+                    // Hiện thông báo đã xóa
+                    Toast.fire({ icon: 'success', title: 'Đã xóa sản phẩm!' });
+
+                    // Nếu xóa hết thì reload để hiện giao diện giỏ trống
+                    if (result.totalQty === 0) location.reload();
+                } else {
+                    Toast.fire({ icon: 'error', title: 'Không thể xóa sản phẩm' });
                 }
-
-                if (cartBadge) cartBadge.innerText = result.totalQty;
-                if (result.totalQty === 0) location.reload();
+            } catch (error) {
+                console.error(error);
+                Toast.fire({ icon: 'error', title: 'Lỗi kết nối server!' });
             }
         });
     });
