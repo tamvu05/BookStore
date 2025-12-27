@@ -77,33 +77,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (result.success) {
-                // 1. Cập nhật số lượng trong ô input
+                // 1. Cập nhật số lượng hiển thị
                 input.value = newQty;
                 
                 // 2. Tính lại Thành tiền của dòng đó
-                const price = parseInt(row.querySelector('.cart-price').getAttribute('data-price'));
+                // Lấy giá gốc từ data-price của tr (nếu chưa có thì phải thêm vào ejs: <tr data-price="<%= item.DonGia %>">)
+                // Hoặc lấy từ data-total chia số lượng cũ (hơi rủi ro). Tốt nhất EJS thêm data-price vào <tr>
+                // Giả sử EJS đã thêm data-price vào <tr> như code trên
+                const price = parseFloat(row.getAttribute('data-price')) || 0;
                 const newTotal = price * newQty;
-                row.querySelector('.cart-total').innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(newTotal);
-
-                // 3. Cập nhật Tạm tính & Tổng cộng (Server trả về grandTotal chuẩn)
-                const formattedTotal = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(result.grandTotal);
                 
-                // Cập nhật số Tổng cộng (Màu đỏ)
-                document.querySelector('.cart-grand-total').innerText = formattedTotal;
-                
-                // --- THÊM MỚI: Cập nhật số Tạm tính (Màu đen ở trên) ---
-                // Tìm phần tử chứa số tạm tính (nó là thẻ span nằm cùng hàng với chữ "Tạm tính:")
-                // Cách an toàn nhất là gán thêm class .cart-subtotal vào HTML ở bước sau
-                const subTotalEl = document.querySelector('.cart-subtotal');
-                if (subTotalEl) subTotalEl.innerText = formattedTotal;
+                // Cập nhật text hiển thị
+                row.querySelector('.cart-total-display').innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(newTotal);
 
-                // --- THÊM MỚI: Cập nhật Icon Giỏ hàng trên Header ---
-                // Server cần trả về thêm totalQty trong API update thì mới cập nhật được
-                // Nếu server chưa trả về, ta có thể tự tính tạm bằng cách cộng trừ trên giao diện (nhưng cách đó ko chuẩn)
-                // Tốt nhất là sửa Controller trả về luôn totalQty.
-                if (result.totalQty !== undefined) {
-                    const cartBadge = document.querySelector('.bi-cart-fill').nextElementSibling;
-                    if (cartBadge) cartBadge.innerText = result.totalQty;
+                // 👇 CẬP NHẬT DATA CHO CHECKBOX ĐỂ HÀM TÍNH TỔNG BIẾT
+                const checkbox = row.querySelector('.item-checkbox');
+                if (checkbox) {
+                    checkbox.setAttribute('data-total', newTotal);
+                }
+
+                // 👇 GỌI HÀM TÍNH LẠI TỔNG (Hàm này nằm bên file ejs)
+                if (typeof window.updateCartSelection === 'function') {
+                    window.updateCartSelection();
+                }
+
+                // Cập nhật icon giỏ hàng
+                if (result.totalQty !== undefined && cartBadge) {
+                    cartBadge.innerText = result.totalQty;
                 }
             }
         } catch (error) {
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => updateQuantity(btn, -1));
     });
 
-    // 2. Nút Xóa
+    // 2. Nút Xóa 
     document.querySelectorAll('.btn-remove-cart').forEach(btn => {
         btn.addEventListener('click', async function() {
             if (!confirm('Bạn có chắc muốn xóa sách này?')) return;
@@ -135,13 +135,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json();
             if (result.success) {
-                row.remove(); // Xóa dòng khỏi bảng HTML
+                row.remove(); 
                 
-                // Cập nhật lại tổng tiền và icon giỏ hàng
-                document.querySelector('.cart-grand-total').innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(result.grandTotal);
-                if (cartBadge) cartBadge.innerText = result.totalQty;
+                // 👇 GỌI HÀM TÍNH LẠI TỔNG
+                if (typeof window.updateCartSelection === 'function') {
+                    window.updateCartSelection();
+                }
 
-                // Nếu xóa hết thì reload để hiện giao diện giỏ trống
+                if (cartBadge) cartBadge.innerText = result.totalQty;
                 if (result.totalQty === 0) location.reload();
             }
         });
