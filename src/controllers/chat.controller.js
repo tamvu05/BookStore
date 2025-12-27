@@ -29,7 +29,7 @@ const ChatController = {
             const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
             
             const prompt = `
-            Bạn là trợ lý ảo bán hàng của nhà sách "KingBook".
+            Bạn là trợ lý ảo bán hàng của nhà sách "BookStore".
             Dưới đây là danh sách các cuốn sách hiện có tại cửa hàng:
             ${contextData}
 
