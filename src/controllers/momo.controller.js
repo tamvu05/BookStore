@@ -53,7 +53,7 @@ const MomoController = {
             if (resultCode == '0') {
                 // --- TRƯỜNG HỢP THÀNH CÔNG ---
                 console.log('Payment successful for Order ID:', realOrderId);
-                await pool.query('UPDATE DonHang SET TrangThai = ?, DaThanhToan = 1 WHERE MaDH = ?', ['CHO_XAC_NHAN', realOrderId]); // Hoặc DA_THANH_TOAN tùy cậu
+                await pool.query('UPDATE DonHang SET TrangThai = ?, HinhThucThanhToan = ? WHERE MaDH = ?', ['DANG_CHUAN_BI_HANG', 'MOMO', realOrderId]);
                 return res.redirect('/?payment=success');
             } else {
                 // --- TRƯỜNG HỢP THẤT BẠI / KHÁCH HỦY ---
