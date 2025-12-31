@@ -263,12 +263,12 @@ class OrderTable extends BaseTable {
     initEventListeners() {
         if (this.tableWrapper)
             this.tableWrapper.addEventListener('click', (event) => {
-                const btnDelete = event.target.closest('.btn-delete-entity')
+                const btnCancel = event.target.closest('.btn-cancel-order')
                 const btnDetails = event.target.closest('.btn-show-details')
                 const sortableHeader = event.target.closest('tr i.sortable')
 
-                if (btnDelete) {
-                    this.deleteEntity(btnDelete)
+                if (btnCancel) {
+                    this.cancelOrder(btnCancel)
                 } else if (btnDetails) {
                     const id = btnDetails.closest('tr').dataset.id
                     this.orderModalInstance.showModal(id)
@@ -308,11 +308,11 @@ class OrderTable extends BaseTable {
         }
     }
 
-    async deleteEntity(btnDelete) {
+    async cancelOrder(btnCancel) {
         try {
             const result = await Swal.fire({
-                title: 'Bạn có chắc muốn tiếp tục xóa?',
-                text: 'Bạn sẽ không hoàn tác được sau khi xóa!',
+                title: 'Xác nhận hủy đơn đặt hàng?',
+                text: 'Hành động này sẽ hoàn trả tồn kho và không thể hoàn tác lại',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -323,14 +323,18 @@ class OrderTable extends BaseTable {
 
             if (!result.isConfirmed) return
 
-            const status = btnDelete.closest('tr').dataset.status
-            const allowedStatusesForDelete = ['CHO_XAC_NHAN', 'DANG_CHUAN_BI_HANG']
+            const status = btnCancel.closest('tr').dataset.status
+            const allowedStatusesForCancel = [
+                'CHO_XAC_NHAN',
+                'CHO_THANH_TOAN',
+                'DANG_CHUAN_BI_HANG',
+            ]
             
-            if (!allowedStatusesForDelete.includes(status)) {
+            if (!allowedStatusesForCancel.includes(status)) {
                 Swal.fire({
                     icon: 'info',
-                    title: 'Không thể xóa đơn hàng!',
-                    text: 'Chỉ có thể xóa đơn hàng ở trạng thái Chờ xác nhận hoặc Đang chuẩn bị hàng.',
+                    title: 'Không thể hủy đơn hàng!',
+                    text: 'Chỉ có thể hủy đơn hàng ở trạng thái Chờ xác nhận, Chờ thanh toán hoặc Đang chuẩn bị hàng.',
                 })
                 return
             }
@@ -344,9 +348,11 @@ class OrderTable extends BaseTable {
                 },
             })
 
-            const id = btnDelete.closest('tr').dataset.id
-            const res = await fetch('/api/sale/order/' + id, {
-                method: 'DELETE',
+            const id = btnCancel.closest('tr').dataset.id
+            const res = await fetch(`/api/sale/order/${id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ TrangThai: 'DA_HUY' }),
             })
             const data = await res.json()
 
@@ -359,7 +365,7 @@ class OrderTable extends BaseTable {
 
             Swal.close()
             Swal.fire({
-                title: 'Xóa đơn đặt hàng thành công!',
+                title: 'Hủy đơn đặt hàng thành công!',
                 icon: 'success',
                 draggable: true,
             })
@@ -370,7 +376,7 @@ class OrderTable extends BaseTable {
             Swal.close()
             Swal.fire({
                 icon: 'error',
-                title: 'Xóa đơn đặt hàng thất bại!',
+                title: 'Hủy đơn đặt hàng thất bại!',
                 text: error.message,
             })
         }

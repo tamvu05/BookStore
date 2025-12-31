@@ -97,7 +97,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm">
+                        <button id="checkout-submit" type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm">
                             XÁC NHẬN ĐẶT HÀNG
                         </button>
                     </div>
@@ -116,4 +116,22 @@
             form.action = '/checkout/order';
         }
     }
+
+    (function preventDoubleSubmit() {
+        const form = document.querySelector('form[action^="/checkout"]');
+        const submitBtn = document.getElementById('checkout-submit');
+        if (!form || !submitBtn) return;
+
+        let locked = false;
+        form.addEventListener('submit', (e) => {
+            if (locked) {
+                e.preventDefault();
+                return false;
+            }
+            locked = true;
+            submitBtn.disabled = true;
+            submitBtn.classList.add('disabled');
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
+        });
+    })();
 </script>

@@ -13,6 +13,7 @@ import employeeRouter from './employee.router.js'
 import authRouter from './auth.router.js'
 import profileRouter from './profile.router.js'
 import chatRouter from './chat.router.js'
+import MomoController from '../../controllers/momo.controller.js'
 
 const router = express.Router()
 
@@ -30,5 +31,8 @@ router.use('/employee', employeeRouter)
 router.use('/auth', authRouter)
 router.use('/profile', profileRouter)
 router.use('/chat', chatRouter)
+
+// Route thanh toán lại MoMo
+router.post('/momo/retry-payment', MomoController.retryPayment)
 
 export default router

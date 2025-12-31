@@ -31,12 +31,16 @@
                                 <td>
                                     <% if (order.TrangThai === 'CHO_XAC_NHAN') { %>
                                         <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                    <% } else if (order.TrangThai === 'DANG_CHUAN_BI_HANG') { %>
+                                        <span class="badge bg-warning text-dark">Đang chuẩn bị hàng</span>
                                     <% } else if (order.TrangThai === 'DANG_GIAO') { %>
                                         <span class="badge bg-primary">Đang giao</span>
                                     <% } else if (order.TrangThai === 'DA_GIAO') { %>
                                         <span class="badge bg-success">Thành công</span>
                                     <% } else if (order.TrangThai === 'DA_HUY') { %>
                                         <span class="badge bg-danger">Đã hủy</span>
+                                    <% } else if (order.TrangThai === 'CHO_THANH_TOAN') { %>
+                                        <span class="badge bg-warning text-dark">Chờ thanh toán</span>
                                     <% } else { %>
                                         <span class="badge bg-secondary"><%= order.TrangThai %></span>
                                     <% } %>
@@ -46,7 +50,7 @@
                                         Xem
                                     </a>
 
-                                    <% if (order.TrangThai === 'CHO_XAC_NHAN') { %>
+                                    <% if (order.TrangThai === 'CHO_XAC_NHAN' || order.TrangThai === 'CHO_THANH_TOAN' || order.TrangThai === 'DANG_CHUAN_BI_HANG') { %>
                                         <button class="btn btn-sm btn-outline-danger ms-2 rounded-pill px-3" onclick="cancelOrder('<%= order.MaDH %>')">
                                             Hủy
                                         </button>

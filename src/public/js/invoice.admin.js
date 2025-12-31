@@ -816,13 +816,13 @@ class InvoiceTable extends BaseTable {
     async handleCancelInvoice(id) {
         const confirmed = await Swal.fire({
             title: 'Xác nhận hủy hóa đơn?',
-            text: 'Hành động này sẽ hoàn trả tồn kho và không thể hoàn tác',
+            text: 'Hành động này sẽ hoàn trả tồn kho và không thể hoàn tác lại',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Xác nhận hủy',
-            cancelButtonText: 'Không',
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy bỏ',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
         })
 
         if (!confirmed.isConfirmed) return

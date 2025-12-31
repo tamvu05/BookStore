@@ -101,10 +101,16 @@ const CheckoutService = {
             const vnTime = getCurrentVietNamTime();
 
             // Lưu Đơn hàng
+            let trangThai = initialStatus;
+            let thanhToanStatus = 'CHUA_THANH_TOAN';
+            if (paymentMethod === 'MOMO') {
+                trangThai = 'CHO_THANH_TOAN';
+                thanhToanStatus = 'CHO_THANH_TOAN';
+            }
             const [orderResult] = await connection.query(
-                `INSERT INTO DonHang (MaKH, NgayDat, TongTien, TenNguoiNhan, DiaChiNhan, SDT, GhiChu, TrangThai, MaVC) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [customerId, vnTime, finalTotal, nguoiNhan, diaChi, sdt, ghiChu, initialStatus, voucherCode || null] 
+                `INSERT INTO DonHang (MaKH, NgayDat, TongTien, TenNguoiNhan, DiaChiNhan, SDT, GhiChu, TrangThai, MaVC, ThanhToan, HinhThucThanhToan) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [customerId, vnTime, finalTotal, nguoiNhan, diaChi, sdt, ghiChu, trangThai, voucherCode || null, thanhToanStatus, paymentMethod] 
             );
             const orderId = orderResult.insertId;
 
@@ -147,7 +153,7 @@ const CheckoutService = {
         } finally {
             if (connection) connection.release();
         }
-    }
+    },
 };
 
 export default CheckoutService;

@@ -132,6 +132,28 @@ const OrderService = {
         ]
         TrangThai = isValid.includes(TrangThai) ? TrangThai : 'CHO_XAC_NHAN'
 
+        const order = await OrderModel.getById(id)
+        if (!order) throw new Error('Đơn hàng không tồn tại')
+
+        // Nếu cập nhật sang trạng thái hủy thì thực hiện hoàn kho
+        if (TrangThai === 'DA_HUY') {
+            const cancellable = [
+                'CHO_XAC_NHAN',
+                'CHO_THANH_TOAN',
+                'DANG_CHUAN_BI_HANG',
+            ]
+
+            if (!cancellable.includes(order.TrangThai)) {
+                throw new Error(
+                    'Chỉ có thể hủy đơn hàng ở trạng thái Chờ xác nhận, Chờ thanh toán hoặc Đang chuẩn bị hàng'
+                )
+            }
+
+            const result = await OrderService.cancelAndRestock(id)
+            if (!result) throw new Error('Hủy đơn hàng thất bại')
+            return { success: true }
+        }
+
         const result = await OrderModel.updateState(id, TrangThai)
 
         if (!result) throw new Error('Cập nhật trạng thái đơn hàng thất bại')
@@ -144,9 +166,9 @@ const OrderService = {
             const order = await OrderModel.getById(id)
             if (!order) throw new Error('Đơn hàng không tồn tại')
             
-            const allowedStatuses = ['CHO_XAC_NHAN', 'DANG_CHUAN_BI_HANG']
+            const allowedStatuses = ['CHO_XAC_NHAN', 'CHO_THANH_TOAN', 'DANG_CHUAN_BI_HANG']
             if (!allowedStatuses.includes(order.TrangThai)) {
-                throw new Error(`Chỉ có thể xóa đơn hàng ở trạng thái Chờ xác nhận hoặc Đang chuẩn bị hàng`)
+                throw new Error(`Chỉ có thể xóa/hủy đơn hàng ở trạng thái Chờ xác nhận, Chờ thanh toán hoặc Đang chuẩn bị hàng`)
             }
             
             const result = await OrderModel.delete(id)
@@ -173,8 +195,9 @@ const OrderService = {
                 throw new Error('Đơn hàng không tồn tại hoặc không phải của bạn!');
             }
 
-            if (order[0].TrangThai !== 'CHO_XAC_NHAN') {
-                throw new Error('Chỉ có thể hủy đơn hàng khi đang chờ xác nhận!');
+            const cancellable = ['CHO_XAC_NHAN', 'CHO_THANH_TOAN', 'DANG_CHUAN_BI_HANG'];
+            if (!cancellable.includes(order[0].TrangThai)) {
+                throw new Error('Chỉ có thể hủy đơn hàng khi đang chờ xác nhận, chờ thanh toán hoặc đang chuẩn bị hàng!');
             }
 
             // B2: Cập nhật trạng thái thành 'DA_HUY'
@@ -200,6 +223,52 @@ const OrderService = {
             await connection.commit();
             return { success: true, message: 'Đã hủy đơn hàng thành công!' };
 
+        } catch (error) {
+            if (connection) await connection.rollback();
+            throw error;
+        } finally {
+            if (connection) connection.release();
+        }
+    },
+
+    // Hủy đơn do hệ thống (MoMo fail) và hoàn kho
+    async cancelAndRestock(orderId) {
+        let connection;
+        try {
+            connection = await pool.getConnection();
+            await connection.beginTransaction();
+
+            const [orderRows] = await connection.query(
+                `SELECT TrangThai FROM DonHang WHERE MaDH = ?`,
+                [orderId]
+            );
+
+            if (orderRows.length === 0) {
+                await connection.rollback();
+                return false;
+            }
+
+            // Cập nhật trạng thái hủy
+            await connection.query(
+                `UPDATE DonHang SET TrangThai = 'DA_HUY' WHERE MaDH = ?`,
+                [orderId]
+            );
+
+            // Hoàn trả kho
+            const [items] = await connection.query(
+                `SELECT MaSach, SoLuong FROM CTDonHang WHERE MaDH = ?`,
+                [orderId]
+            );
+
+            for (const item of items) {
+                await connection.query(
+                    `UPDATE Sach SET SoLuongTon = SoLuongTon + ? WHERE MaSach = ?`,
+                    [item.SoLuong, item.MaSach]
+                );
+            }
+
+            await connection.commit();
+            return true;
         } catch (error) {
             if (connection) await connection.rollback();
             throw error;

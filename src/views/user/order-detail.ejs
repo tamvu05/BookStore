@@ -8,6 +8,10 @@
         <div>
             <% if (order.TrangThai === 'CHO_XAC_NHAN') { %>
                 <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill">Chờ xác nhận</span>
+            <% } else if (order.TrangThai === 'CHO_THANH_TOAN') { %>
+                <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill">Chờ thanh toán</span>
+            <% } else if (order.TrangThai === 'DANG_CHUAN_BI_HANG') { %>
+                <span class="badge bg-info text-white fs-6 px-3 py-2 rounded-pill">Đang chuẩn bị hàng</span>
             <% } else if (order.TrangThai === 'DANG_GIAO') { %>
                 <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill">Đang giao hàng</span>
             <% } else if (order.TrangThai === 'DA_GIAO') { %>
@@ -97,7 +101,79 @@
                 <a href="/order/history" class="btn btn-outline-secondary rounded-pill px-4">
                     <i class="bi bi-arrow-left me-1"></i> Quay lại
                 </a>
+
+                <% if (order.TrangThai === 'CHO_THANH_TOAN') { %>
+                    <button class="btn btn-success rounded-pill px-4 ms-2" onclick="retryPaymentMoMo('<%= order.MaDH %>')">
+                        <i class="bi bi-credit-card me-1"></i> Thanh toán MoMo
+                    </button>
+                    <button class="btn btn-outline-danger rounded-pill px-4 ms-2" onclick="cancelOrder('<%= order.MaDH %>')">
+                        <i class="bi bi-x-circle me-1"></i> Hủy đơn
+                    </button>
+                <% } else if (order.TrangThai === 'CHO_XAC_NHAN' || order.TrangThai === 'DANG_CHUAN_BI_HANG') { %>
+                    <button class="btn btn-outline-danger rounded-pill px-4 ms-2" onclick="cancelOrder('<%= order.MaDH %>')">
+                        <i class="bi bi-x-circle me-1"></i> Hủy đơn
+                    </button>
+                <% } %>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    async function cancelOrder(orderId) {
+        const confirm = await Swal.fire({
+            title: 'Hủy đơn hàng?',
+            text: "Bạn có chắc muốn hủy đơn hàng #" + orderId + " không?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Đồng ý hủy',
+            cancelButtonText: 'Không'
+        });
+
+        if (!confirm.isConfirmed) return;
+
+        try {
+            const response = await fetch('/order/cancel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                await Swal.fire('Thành công!', result.message, 'success');
+                window.location.href = '/order/history';
+            } else {
+                Swal.fire('Thất bại!', result.message, 'error');
+            }
+        } catch (error) {
+            Swal.fire('Lỗi!', 'Không thể kết nối đến máy chủ', 'error');
+            console.error(error);
+        }
+    }
+
+    async function retryPaymentMoMo(orderId) {
+        try {
+            // Tạo form để submit thanh toán MoMo
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/api/momo/retry-payment';
+            
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'orderId';
+            input.value = orderId;
+            
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        } catch (error) {
+            Swal.fire('Lỗi!', 'Không thể kết nối đến máy chủ', 'error');
+            console.error(error);
+        }
+    }
+</script>

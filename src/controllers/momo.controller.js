@@ -1,5 +1,6 @@
 import MomoService from '../services/momo.service.js';
 import CheckoutService from '../services/checkout.service.js';
+import OrderService from '../services/order.service.js';
 import pool from '../configs/db.js';
 
 const MomoController = {
@@ -53,14 +54,17 @@ const MomoController = {
             if (resultCode == '0') {
                 // --- TRƯỜNG HỢP THÀNH CÔNG ---
                 console.log('Payment successful for Order ID:', realOrderId);
-                await pool.query('UPDATE DonHang SET TrangThai = ?, HinhThucThanhToan = ? WHERE MaDH = ?', ['DANG_CHUAN_BI_HANG', 'MOMO', realOrderId]);
+                await pool.query('UPDATE DonHang SET TrangThai = ?, ThanhToan = ? WHERE MaDH = ?', ['DANG_CHUAN_BI_HANG', 'DA_THANH_TOAN', realOrderId]);
                 return res.redirect('/?payment=success');
             } else {
                 // --- TRƯỜNG HỢP THẤT BẠI / KHÁCH HỦY ---
                 console.log('Payment failed/cancelled for Order ID:', realOrderId);
 
-                // 🔥 THÊM ĐOẠN NÀY: Cập nhật trạng thái thành ĐÃ HỦY ngay
-                await pool.query('UPDATE DonHang SET TrangThai = ? WHERE MaDH = ?', ['DA_HUY', realOrderId]);
+                try {
+                    await OrderService.cancelAndRestock(realOrderId);
+                } catch (rollbackErr) {
+                    console.error('Cancel/Restock error:', rollbackErr);
+                }
 
                 return res.redirect('/checkout?payment=failed');
             }
@@ -94,6 +98,11 @@ const MomoController = {
                 );
             } else {
                  console.log(`IPN: Payment failed for Order ${realOrderId}`);
+                 try {
+                    await OrderService.cancelAndRestock(realOrderId);
+                 } catch (rollbackErr) {
+                    console.error('Cancel/Restock error:', rollbackErr);
+                 }
             }
 
             // Phản hồi cho MoMo biết đã nhận tin
@@ -101,6 +110,46 @@ const MomoController = {
         } catch (error) {
             console.error('Momo IPN Error:', error);
             res.status(500).json({ message: 'Internal Server Error' });
+        }
+    },
+
+    // 4. THANH TOÁN LẠI ĐƠN HÀNG CHỜ THANH TOÁN
+    retryPayment: async (req, res) => {
+        try {
+            if (!req.session.user) return res.redirect('/login');
+
+            const { orderId } = req.body;
+            const customerId = req.session.user.customerId;
+
+            // Kiểm tra đơn hàng có tồn tại và thuộc về khách này không
+            const [orders] = await pool.query(
+                'SELECT * FROM DonHang WHERE MaDH = ? AND MaKH = ? AND TrangThai = ?',
+                [orderId, customerId, 'CHO_THANH_TOAN']
+            );
+
+            if (orders.length === 0) {
+                return res.status(400).send('Đơn hàng không hợp lệ hoặc đã được thanh toán');
+            }
+
+            const order = orders[0];
+
+            // Gọi MoMo Service để tạo link thanh toán mới
+            const result = await MomoService.createPaymentRequest(
+                orderId.toString(),
+                Math.round(Number(order.TongTien)),
+                `Thanh toan don hang #${orderId}`
+            );
+
+            if (result && result.payUrl) {
+                return res.redirect(result.payUrl);
+            } else {
+                console.error('MoMo Creation Failed:', result);
+                return res.status(500).send('Lỗi tạo giao dịch MoMo: ' + (result.message || 'Unknown error'));
+            }
+
+        } catch (error) {
+            console.error('Momo Retry Payment Error:', error);
+            res.status(500).send('Lỗi thanh toán MoMo');
         }
     }
 };
