@@ -8,7 +8,6 @@ const InvoiceController = {
         try {
             const query = req.query
             const data = await InvoiceService.getWithParam(query)
-            console.log(data.invoices)
             res.render('admin/saleInvoice', {
                 invoices: data.invoices,
                 currentPage: data.currentPage,

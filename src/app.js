@@ -58,7 +58,7 @@ app.use(async (req, res, next) => {
     // Mặc định giỏ hàng là 0
     res.locals.totalQuantity = 0;
 
-    console.log("🔍 Kiểm tra Session User:", req.session.user);
+    // console.log("🔍 Kiểm tra Session User:", req.session.user);
 
     // Nếu đã đăng nhập -> Gọi DB đếm số lượng
     if (req.session.user && req.session.user.customerId) {

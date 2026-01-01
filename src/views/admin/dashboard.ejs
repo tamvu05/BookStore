@@ -12,9 +12,6 @@ const stats = locals.stats || {
     newOrders: [],
 };
 
-console.log('======================================');
-console.log(stats);
-
 const recentBooks = stats.recentBooks || [];
 
 const lowStockAlerts = (stats.lowStockBooksList || []).map(book => ({
