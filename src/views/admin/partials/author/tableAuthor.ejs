@@ -6,9 +6,9 @@
     <table class="table table-striped table-hover align-middle">
         <thead>
             <tr>
-                <th>STT</th>
+                <th>Mã</th>
                 <th>
-                    <i class="sortable" data-sort="TenTG">Tên tác giả</i>
+                    <i class="sortable" data-sort="TenTG">Tác giả</i>
                 </th>
                 <th>Mô tả</th>
                 <% if (isManager) { %>
@@ -23,8 +23,8 @@
                 <% authors.forEach((author, index)=> { %>
 
                     <tr data-id="<%= author.MaTG %>">
-                        <td class="stt-col">
-                            <%= index + 1 %>
+                        <td >
+                            #<%= author.MaTG %>
                         </td>
                         <td class="name font-weight-bold">
                             <%= author.TenTG %>

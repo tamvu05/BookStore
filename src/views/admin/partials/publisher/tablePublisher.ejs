@@ -6,9 +6,9 @@
     <table class="table table-striped table-hover align-middle">
         <thead>
             <tr>
-                <th>STT</th>
+                <th>Mã</th>
                 <th>
-                    <i class="sortable" data-sort="TenNXB">Tên nhà xuất bản</i>
+                    <i class="sortable" data-sort="TenNXB">Nhà xuất bản</i>
                 </th>
                 <th>Mô tả</th>
                 <% if (isManager) { %>
@@ -23,8 +23,8 @@
                 <% publishers.forEach((publisher, index)=> { %>
 
                     <tr data-id="<%= publisher.MaNXB %>">
-                        <td class="stt-col">
-                            <%= index + 1 %>
+                        <td>
+                            #<%= publisher.MaNXB %>
                         </td>
                         <td class="name font-weight-bold">
                             <%= publisher.TenNXB %>

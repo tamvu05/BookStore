@@ -8,7 +8,7 @@
         <table class="table table-striped table-hover align-middle">
             <thead>
                 <tr>
-                    <th>STT</th>
+                    <th>Mã</th>
                     <th>
                         <i class="sortable" data-sort="TenNCC">Nhà cung cấp</i>
                     </th>
@@ -22,8 +22,8 @@
                 <% if (suppliers.length > 0) { %>
                     <% suppliers.forEach((supply, index) => { %>
                         <tr data-id="<%= supply.MaNCC %>">
-                            <td class="stt-col">
-                                <%= index + 1 %>
+                            <td>
+                                #<%= supply.MaNCC %>
                             </td>
                             <td class="name font-weight-bold">
                                 <%= supply.TenNCC %>

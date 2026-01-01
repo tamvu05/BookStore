@@ -6,9 +6,9 @@
     <table class="table table-striped table-hover align-middle">
         <thead>
             <tr>
-                <th>STT</th>
+                <th>Mã</th>
                 <th>
-                    <i class="sortable" data-sort="TenTL">Tên thể loại</i>
+                    <i class="sortable" data-sort="TenTL">Thể loại</i>
                 </th>
                 <th>Mô tả</th>
                 <% if (isManager) { %>
@@ -23,8 +23,8 @@
                 <% categories.forEach((category, index)=> { %>
 
                     <tr data-id="<%= category.MaTL %>">
-                        <td class="stt-col">
-                            <%= index + 1 %>
+                        <td>
+                            #<%= category.MaTL %>
                         </td>
                         <td class="name font-weight-bold">
                             <%= category.TenTL %>

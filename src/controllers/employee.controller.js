@@ -74,7 +74,11 @@ const EmployeeController = {
         try {
             const { id } = req.params
             const data = await EmployeeService.getById(id)
-            return res.json(data)
+            const currentUserMaNV = req?.session?.account?.MaNV
+            return res.json({
+                ...data,
+                isCurrentUser: data.MaNV === currentUserMaNV
+            })
         } catch (err) {
             next(err)
         }

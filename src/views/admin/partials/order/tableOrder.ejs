@@ -22,7 +22,7 @@
     <table class="table table-striped table-hover align-middle">
         <thead>
             <tr>
-                <th>Mã đơn</th>
+                <th>Mã</th>
                 <th>Điện thoại</th>
                 <th>Hình thức thanh toán</th>
                 <th>Trạng thái đơn hàng</th>
@@ -58,7 +58,7 @@
                             <% } else if (order.TrangThai === 'CHO_THANH_TOAN') { %>
                             <span class="badge bg-warning text-white">Chờ thanh toán</span>
                             <% } else if (order.TrangThai === 'DA_HUY') { %>
-                                <span class="badge bg-secondary">Đã hủy</span>
+                                <span class="badge bg-danger">Đã hủy</span>
                             <% } %>
                         </td>
                         <td class="text-muted">

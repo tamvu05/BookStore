@@ -97,6 +97,13 @@ class EmployeeFormModal {
             this.inputDayOfWork.value = formatDate(employee.NgayVaoLam) // Ngày vào làm 
             this.inputPassword.value = '' // Luôn để trống Mật khẩu khi sửa
             this.stateSelect.value = employee.TrangThai
+            
+            // Disable input trạng thái nếu đây là tài khoản đang đăng nhập
+            if (employee.isCurrentUser) {
+                this.stateSelect.disabled = true
+            } else {
+                this.stateSelect.disabled = false
+            }
         } catch (error) {
             console.error('Lỗi khi nạp dữ liệu nhân viên:', error)
             Swal.close()
@@ -115,6 +122,7 @@ class EmployeeFormModal {
         this.inputEmail.disabled = false
         this.inputPassword.placeholder = ''
         this.stateSelect.value = ''
+        this.stateSelect.disabled = false
         this.contStateSelect.classList.add('d-none')
         this.inputPassword.setAttribute('required', true)
     }

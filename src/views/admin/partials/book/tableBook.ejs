@@ -12,13 +12,12 @@
     <table class="table table-striped table-hover align-middle">
         <thead>
             <tr>
-                <th>Ảnh bìa <%= isManager %></th>
+                <th>Mã</th>
+                <th>Ảnh bìa</th>
                 <th>
-                    <i class="sortable" data-sort="TenSach">Tên sách</i>
+                    <i class="sortable" data-sort="TenSach">Sách</i>
                 </th>
-                <th>Tác giả</th>
-                <th>Thể loại</th>
-                <th>Nhà xuất bản</th>
+                <th>Thông tin</th>
                 <th>Tồn kho</th>
                 <th>Giá bán</th>
                 <% if (isManager) { %>
@@ -34,20 +33,21 @@
 
                     <tr data-id="<%= book.MaSach %>">
                         <td>
-                            <img src="<%= book.HinhAnh %>" class="book-cover-thumb" alt="<%= book.TenSach %>"
-                                onerror="this.onerror=null; this.src='/images/book.jpg';">
+                            #<%= book.MaSach %>
+                        </td>
+                        <td>
+                            <a href="<%= book.HinhAnh %>" class="book-cover-link" target="_blank" rel="noopener noreferrer">
+                                <img src="<%= book.HinhAnh %>" class="book-cover-thumb" alt="<%= book.TenSach %>"
+                                    onerror="this.onerror=null; this.src='/images/book.jpg'; this.parentElement.href='/images/book.jpg';">
+                            </a>
                         </td>
                         <td class="name font-weight-bold">
                             <%= book.TenSach %>
                         </td>
-                        <td class="desc text-muted">
-                            <%= book.TenTG %>
-                        </td>
-                        <td class="desc text-muted">
-                            <%= book.TenTL %>
-                        </td>
-                        <td class="desc text-muted">
-                            <%= book.TenNXB %>
+                        <td class="book-info">
+                            <div class="info-line"><strong>Tác giả:</strong> <%= book.TenTG %></div>
+                            <div class="info-line"><strong>Thể loại:</strong> <%= book.TenTL %></div>
+                            <div class="info-line"><strong>NXB:</strong> <%= book.TenNXB %></div>
                         </td>
                         <td class="desc text-muted">
                             <%= book.SoLuongTon %>
@@ -71,7 +71,7 @@
                         <% } else { %>
 
                             <tr class="no-data">
-                                <td colspan="<%= isManager ? 8 : 7 %>" class="text-center py-4">
+                                <td colspan="<%= isManager ? 6 : 5 %>" class="text-center py-4">
                                     Không có dữ liệu...
                                 </td>
                             </tr>
@@ -96,5 +96,32 @@
         /* Đặt border hoặc box-shadow nhẹ để làm nổi bật (tùy chọn) */
         border: 1px solid #ddd;
         border-radius: 4px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .book-cover-thumb:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* --- Style cho cột thông tin gộp --- */
+    .book-info {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .book-info .info-line {
+        margin-bottom: 0.2rem;
+    }
+
+    .book-info .info-line:last-child {
+        margin-bottom: 0;
+    }
+
+    .book-info strong {
+        color: #6c757d;
+        font-weight: 600;
+        font-size: 0.85rem;
     }
 </style>

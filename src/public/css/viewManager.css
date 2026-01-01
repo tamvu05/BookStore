@@ -155,6 +155,7 @@ table th, table td, .modal-body label {
     border-spacing: 0;
     /* Loại bỏ border Bootstrap mặc định */
     border: none !important;
+    table-layout: auto;
 }
 
 /* --- HEADER STYLES --- */
@@ -166,8 +167,8 @@ table th, table td, .modal-body label {
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.85rem;
-    padding: 1rem 1.25rem;
-    /* Tăng padding */
+    padding: 0.85rem 0.75rem;
+    /* Padding tối ưu */
     border-bottom: 2px solid #e9ecef;
     /* Thuộc tính quan trọng: Ngăn chặn việc tô chọn văn bản */
     -webkit-user-select: none;
@@ -199,8 +200,8 @@ table th, table td, .modal-body label {
 }
 
 .table tbody tr td {
-    padding: 1rem 1.25rem;
-    /* Padding đồng nhất */
+    padding: 0.65rem 0.75rem;
+    /* Padding tối ưu */
     border-top: 1px solid #f0f0f0;
 }
 
@@ -216,11 +217,11 @@ table th, table td, .modal-body label {
 
 /* --- COLUMN SPECIFIC STYLES --- */
 
-.table .stt-col {
+/* .table .stt-col {
     width: 5%;
     font-weight: 500;
     color: #888;
-}
+} */
 
 .table .name {
     color: #212529;
@@ -234,7 +235,10 @@ table th, table td, .modal-body label {
 }
 
 .table .action-col {
-    width: 20%;
+    width: 120px;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    white-space: nowrap;
 }
 
 /* --- ACTION BUTTON STYLES --- */
