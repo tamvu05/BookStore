@@ -6,7 +6,7 @@ import config from './db.config.js'
 const { host, port, user, pass, name } = config
 
 // Lấy đường dẫn thư mục hiện tại (thư mục src/configs)
-const __dirname = import.meta.dirname
+const rootDir = process.cwd();
 
 const pool = mysql.createPool({
     host: host,
@@ -20,8 +20,7 @@ const pool = mysql.createPool({
 
     // CẤU HÌNH SSL CHUẨN (Dùng chứng chỉ)
     ssl: {
-        // Đọc file ca.pem nằm cùng thư mục với file db.js này
-        ca: fs.readFileSync(path.join(__dirname, 'ca.pem')),
+        ca: fs.readFileSync(path.join(rootDir, 'ca.pem')),
     },
 })
 
