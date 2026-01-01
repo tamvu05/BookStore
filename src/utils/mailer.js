@@ -6,8 +6,8 @@ dotenv.config();
 // 1. Tạo Transporter (người vận chuyển)
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465, // Hoặc 587
-    secure: true, // true cho cổng 465, false cho cổng 587
+    port: 587, // Hoặc 587
+    secure: false, // true cho cổng 465, false cho cổng 587
     auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS, // Đảm bảo đây là App Password
