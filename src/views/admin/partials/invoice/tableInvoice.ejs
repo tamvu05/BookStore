@@ -36,7 +36,13 @@
 
                     <tr data-id="<%= invoice.MaHD %>" data-status="<%= invoice.TrangThai %>">
                         <td>
-                            #<%= invoice.MaHD %>
+                            #HD<%= invoice.MaHD %>
+                            <% if (invoice.MaDH) { %>
+                                - DH<%= invoice.MaDH %>
+                            <% } else { %>
+                                - OFF
+                            <% } %>
+                            
                         </td>
                         <td>
                             <%= invoice.SDTKhachHang || 'Không ghi nhận' %>

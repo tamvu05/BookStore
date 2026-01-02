@@ -18,7 +18,7 @@
                     <% if (orders && orders.length > 0) { %>
                         <% orders.forEach(order => { %>
                             <tr>
-                                <td class="ps-4 fw-bold text-primary">#<%= order.MaDH %></td>
+                                <td class="ps-4 fw-bold text-primary">#DH<%= order.MaDH %></td>
                                 <td><%= new Date(order.NgayDat).toLocaleDateString('vi-VN') %></td>
                                 <td>
                                     <div class="fw-bold text-dark"><%= order.TenNguoiNhan %></div>
