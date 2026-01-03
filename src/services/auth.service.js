@@ -51,7 +51,7 @@ const AuthService = {
 
     // --- CÁC HÀM DƯỚI GIỮ NGUYÊN ---
     async login(email, password) {
-        const [users] = await pool.query('SELECT * FROM TaiKhoan WHERE TenDangNhap = ?', [email])
+        const [users] = await pool.query('SELECT * FROM TaiKhoan WHERE VaiTro = 2 AND TenDangNhap = ?', [email])
         const user = users[0]
 
         if (!user) throw new Error('Tài khoản không tồn tại')

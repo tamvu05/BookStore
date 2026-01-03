@@ -208,21 +208,3 @@ CREATE INDEX idx_sach_tensach ON Sach(TenSach);
 CREATE INDEX idx_tacgia_tentacgia ON TacGia(TenTG);
 CREATE INDEX idx_theloai_tentheloai ON TheLoai(TenTL);
 CREATE INDEX idx_nhaxuatban_tennhaxuatban ON NhaXuatBan(TenNXB);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
