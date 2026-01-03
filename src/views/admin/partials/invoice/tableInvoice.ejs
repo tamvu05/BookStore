@@ -21,8 +21,8 @@
         <thead>
             <tr>
                 <th>Mã</th>
-                <th>Điện thoại</th>
                 <th>Ngày tạo</th>
+                <th>Điện thoại</th>
                 <th>Tổng tiền</th>
                 <th>Trạng thái</th>
                 <th class="text-center">Thao tác</th>
@@ -42,13 +42,12 @@
                             <% } else { %>
                                 - OFF
                             <% } %>
-                            
-                        </td>
-                        <td>
-                            <%= invoice.SDTKhachHang || 'Không ghi nhận' %>
                         </td>
                         <td class="text-muted">
                             <%= formatTime7(invoice.NgayTaoHoaDon) %>
+                        </td>
+                        <td>
+                            <%= invoice.SDTKhachHang || 'Không ghi nhận' %>
                         </td>
                         <td class="text-muted">
                             <%= formatPrice(invoice.TongTien) %> 

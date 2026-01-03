@@ -443,10 +443,10 @@ class ExportReceiptTable extends BaseTable {
     }
 
     loadInitialState() {
-        this.searchInput.setAttribute(
-            'placeholder',
-            'Tìm kiếm theo tên nhân viên'
-        )
+        // this.searchInput.setAttribute(
+        //     'placeholder',
+        //     'Tìm kiếm theo tên nhân viên'
+        // )
 
         const urlParams = new URLSearchParams(window.location.search)
 

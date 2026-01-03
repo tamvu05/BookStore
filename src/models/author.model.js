@@ -42,16 +42,6 @@ const AuthorModel = {
         )
         return result[0].total
     },
-
-    // async getByName(TenTG) {
-    //     const [result] = pool.query('SELECT * FROM TacGia WHERE TenTG = ?', [TenTG])
-    //     return result[0] || null
-    // },
-
-    // async getOtherByName(TenTG, MaTG) {
-    //     const [result] = pool.query('SELECT * FROM TacGia WHERE MaTG <> ? AND TenTG = ?', [MaTG, TenTG])
-    //     return result[0] || null
-    // },
 }
 
 export default AuthorModel

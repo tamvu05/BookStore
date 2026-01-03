@@ -57,6 +57,24 @@ class OrderModal {
         try {
             const newStatus = this.selectStatus.value
 
+            // Nếu chuyển sang "Đã giao", hiển thị xác nhận
+            if (newStatus === 'DA_GIAO') {
+                const result = await Swal.fire({
+                    title: 'Xác nhận giao hàng?',
+                    text: 'Xác nhận giao hàng sẽ tạo hóa đơn tương ứng',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Hủy',
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                })
+
+                if (!result.isConfirmed) {
+                    return
+                }
+            }
+
             Swal.fire({
                 title: 'Đang xử lý...',
                 text: 'Vui lòng chờ trong giây lát!',
@@ -141,8 +159,10 @@ class OrderModal {
             // Disable status update nếu đơn hàng đã giao hoặc đã hủy
             const isDelivered = orderData.TrangThai === 'DA_GIAO'
             const isCancelled = orderData.TrangThai === 'DA_HUY'
-            this.selectStatus.disabled = isDelivered || isCancelled
-            this.btnSave.disabled = isDelivered || isCancelled
+            // Disable nếu là MoMo chưa thanh toán
+            const isMomoUnpaid = orderData.HinhThucThanhToan === 'MOMO' && orderData.ThanhToan !== 'DA_THANH_TOAN'
+            this.selectStatus.disabled = isDelivered || isCancelled || isMomoUnpaid
+            this.btnSave.disabled = isDelivered || isCancelled || isMomoUnpaid
 
             let html = ''
             let totalAmount = 0

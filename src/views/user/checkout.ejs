@@ -134,4 +134,11 @@
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
         });
     })();
+    
+    // Reload page when user comes back (from MoMo or back button)
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            location.reload();
+        }
+    });
 </script>

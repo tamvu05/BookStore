@@ -23,10 +23,11 @@
         <thead>
             <tr>
                 <th>Mã</th>
+                <th>Ngày tạo</th>
                 <th>Điện thoại</th>
                 <th>Hình thức thanh toán</th>
-                <th>Trạng thái đơn hàng</th>
                 <th>Tổng tiền</th>
+                <th>Trạng thái</th>
                 <th class="text-center">Thao tác</th>
             </tr>
         </thead>
@@ -40,11 +41,17 @@
                         <td>
                             #DH<%= order.MaDH %>
                         </td>
+                        <td class="text-muted">
+                            <%= formatTime7(order.NgayDat) %>
+                        </td>
                         <td>
                             <%= order.SDT %>
                         </td>
                         <td class="text-muted">
                             <%= order.HinhThucThanhToan %> - <%= THANH_TOAN[order.ThanhToan] %>
+                        </td>
+                        <td class="text-muted">
+                            <%= formatPrice(order.TongTien) %> 
                         </td>
                         <td class="text-muted">
                             <% if (order.TrangThai === 'CHO_XAC_NHAN') { %>
@@ -60,9 +67,6 @@
                             <% } else if (order.TrangThai === 'DA_HUY') { %>
                                 <span class="badge bg-danger">Đã hủy</span>
                             <% } %>
-                        </td>
-                        <td class="text-muted">
-                            <%= formatPrice(order.TongTien) %> 
                         </td>
                         <td class="action-col text-center">
                             <button class="btn-show-details btn action-btn edit-btn" title="Cập nhật">

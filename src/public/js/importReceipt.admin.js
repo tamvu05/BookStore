@@ -407,10 +407,10 @@ class ImportReceiptTable extends BaseTable {
     }
 
     loadInitialState() {
-        this.searchInput.setAttribute(
-            'placeholder',
-            'Tìm kiếm theo tên nhà cung cấp'
-        )
+        // this.searchInput.setAttribute(
+        //     'placeholder',
+        //     'Tìm kiếm theo tên nhà cung cấp'
+        // )
         const urlParams = new URLSearchParams(window.location.search)
 
         const page = urlParams.get('page')

@@ -52,32 +52,28 @@ const OrderModel = {
         const connection = await pool.getConnection()
         try {
             await connection.beginTransaction()
-            
+
             // Update order status
-            const [result] = await connection.query(
-                'UPDATE DonHang SET TrangThai = ? WHERE MaDH = ?',
-                [TrangThai, id]
-            )
-            
+            const [result] = await connection.query('UPDATE DonHang SET TrangThai = ? WHERE MaDH = ?', [TrangThai, id])
+
             // If status changes to 'DA_GIAO', create invoice automatically
             if (TrangThai === 'DA_GIAO') {
-                const [order] = await connection.query(
-                    'SELECT MaDH, TenNguoiNhan, SDT, DiaChiNhan, TongTien, GhiChu FROM DonHang WHERE MaDH = ?',
-                    [id]
-                )
-                
+                const [order] = await connection.query('SELECT MaDH, TenNguoiNhan, SDT, DiaChiNhan, TongTien, GhiChu FROM DonHang WHERE MaDH = ?', [id])
+
+                await connection.query('UPDATE DonHang SET ThanhToan = ? WHERE MaDH = ?', ['DA_THANH_TOAN', id])
+
                 if (order.length > 0) {
                     const donHang = order[0]
-                    
+
                     // Create invoice based on order info
                     const [invoiceResult] = await connection.query(
                         `INSERT INTO HoaDon (MaDH, NgayTaoHoaDon, TongTien, TenKhachHang, SDTKhachHang, GhiChu, HinhThucThanhToan, TrangThai)
                         VALUES (?, CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+07:00'), ?, ?, ?, ?, 'BANK_TRANSFER', 'DA_THANH_TOAN')`,
                         [donHang.MaDH, donHang.TongTien, donHang.TenNguoiNhan, donHang.SDT, donHang.GhiChu]
                     )
-                    
+
                     const MaHD = invoiceResult.insertId
-                    
+
                     // Copy invoice details from order
                     await connection.query(
                         `INSERT INTO CTHoaDon (MaHD, MaSach, SoLuong, DonGia)
@@ -86,7 +82,7 @@ const OrderModel = {
                     )
                 }
             }
-            
+
             await connection.commit()
             return result.affectedRows > 0
         } catch (error) {
