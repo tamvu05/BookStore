@@ -137,9 +137,9 @@ const OrderService = {
         if (!order) throw new Error('Đơn hàng không tồn tại')
 
         // Không cho cập nhật trạng thái nếu là đơn MoMo chưa thanh toán
-        if (order.HinhThucThanhToan === 'MOMO' && order.ThanhToan !== 'DA_THANH_TOAN') {
-            throw new Error('Không thể cập nhật trạng thái đơn hàng MoMo chưa được thanh toán')
-        }
+        // if (order.HinhThucThanhToan === 'MOMO' && order.ThanhToan !== 'DA_THANH_TOAN') {
+        //     throw new Error('Không thể cập nhật trạng thái đơn hàng MoMo chưa được thanh toán')
+        // }
 
         // Nếu cập nhật sang trạng thái hủy thì thực hiện hoàn kho
         if (TrangThai === 'DA_HUY') {
