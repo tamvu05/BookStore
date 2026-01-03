@@ -51,11 +51,16 @@ const MomoController = {
             // Tách chuỗi để lấy ID thật
             const realOrderId = String(orderId).split('_')[0]; 
 
+            // Lấy domain hiện tại (hỗ trợ localhost và Render)
+            const protocol = req.protocol;
+            const host = req.get('host');
+            const baseUrl = `${protocol}://${host}`;
+
             if (resultCode == '0') {
                 // --- TRƯỜNG HỢP THÀNH CÔNG ---
                 console.log('Payment successful for Order ID:', realOrderId);
                 await pool.query('UPDATE DonHang SET TrangThai = ?, ThanhToan = ? WHERE MaDH = ?', ['DANG_CHUAN_BI_HANG', 'DA_THANH_TOAN', realOrderId]);
-                return res.redirect('/?payment=success');
+                return res.redirect(`${baseUrl}/?payment=success`);
             } else {
                 // --- TRƯỜNG HỢP THẤT BẠI / KHÁCH HỦY ---
                 console.log('Payment failed/cancelled for Order ID:', realOrderId);
@@ -66,7 +71,7 @@ const MomoController = {
                     console.error('Cancel/Restock error:', rollbackErr);
                 }
 
-                return res.redirect('/checkout?payment=failed');
+                return res.redirect(`${baseUrl}/checkout?payment=failed`);
             }
         } catch (error) {
             console.error('Momo Callback Error:', error);
