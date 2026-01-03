@@ -150,9 +150,10 @@ const OrderController = {
     // PATCH /api/sale/order/:id
     async updateState(req, res, next) {
         try {
+            const MaNV = req?.session?.account?.MaNV
             const { id } = req.params
             const { TrangThai } = req.body
-            const data = await OrderService.updateState(id, TrangThai)
+            const data = await OrderService.updateState(id, MaNV, TrangThai)
             res.json(data)
         } catch (error) {
             next(error)

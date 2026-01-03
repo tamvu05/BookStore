@@ -120,8 +120,9 @@ const OrderService = {
         return order
     },
 
-    async updateState(id, TrangThai) {
+    async updateState(id, MaNV, TrangThai) {
         if (!id) throw new Error('Thiếu mã đơn hàng')
+        if (!MaNV) throw new Error('Thiếu mã nhân viên')
         const isValid = [
             'CHO_XAC_NHAN',
             'DANG_CHUAN_BI_HANG',
@@ -159,7 +160,7 @@ const OrderService = {
             return { success: true }
         }
 
-        const result = await OrderModel.updateState(id, TrangThai)
+        const result = await OrderModel.updateState(id, MaNV, TrangThai)
 
         if (!result) throw new Error('Cập nhật trạng thái đơn hàng thất bại')
         return result

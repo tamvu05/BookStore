@@ -48,7 +48,7 @@ const OrderModel = {
         return rows
     },
 
-    async updateState(id, TrangThai = 'CHO_XAC_NHAN') {
+    async updateState(id, MaNV, TrangThai = 'CHO_XAC_NHAN') {
         const connection = await pool.getConnection()
         try {
             await connection.beginTransaction()
@@ -67,9 +67,9 @@ const OrderModel = {
 
                     // Create invoice based on order info
                     const [invoiceResult] = await connection.query(
-                        `INSERT INTO HoaDon (MaDH, NgayTaoHoaDon, TongTien, TenKhachHang, SDTKhachHang, GhiChu, HinhThucThanhToan, TrangThai)
-                        VALUES (?, CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+07:00'), ?, ?, ?, ?, 'BANK_TRANSFER', 'DA_THANH_TOAN')`,
-                        [donHang.MaDH, donHang.TongTien, donHang.TenNguoiNhan, donHang.SDT, donHang.GhiChu]
+                        `INSERT INTO HoaDon (MaDH, MaNV, NgayTaoHoaDon, TongTien, TenKhachHang, SDTKhachHang, GhiChu, HinhThucThanhToan, TrangThai)
+                        VALUES (?, ?, CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+07:00'), ?, ?, ?, ?, 'BANK_TRANSFER', 'DA_THANH_TOAN')`,
+                        [donHang.MaDH, MaNV, donHang.TongTien, donHang.TenNguoiNhan, donHang.SDT, donHang.GhiChu]
                     )
 
                     const MaHD = invoiceResult.insertId
