@@ -3,8 +3,12 @@ import https from 'https';
 import config from '../configs/momo.config.js';
 
 const MomoService = {
-    createPaymentRequest: async (orderId, amount, orderInfo) => {
-        const { partnerCode, accessKey, secretKey, endpoint, redirectUrl, ipnUrl, requestType, extraData, autoCapture, lang } = config;
+    createPaymentRequest: async (orderId, amount, orderInfo, redirectUrl = null, ipnUrl = null) => {
+        const { partnerCode, accessKey, secretKey, endpoint } = config;
+
+        // Sử dụng redirectUrl truyền vào, nếu không có thì dùng từ config
+        const finalRedirectUrl = redirectUrl || config.redirectUrl;
+        const finalIpnUrl = ipnUrl || config.ipnUrl;
 
         // Tạo requestId ngẫu nhiên (giữ nguyên logic cũ của cậu)
         const requestId = String(orderId) + new Date().getTime();
@@ -15,7 +19,7 @@ const MomoService = {
         const orderIdMomo = String(orderId) + '_' + new Date().getTime();
 
         // 🔥 [QUAN TRỌNG] Trong rawSignature phải dùng orderIdMomo
-        const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderIdMomo}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
+        const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=&ipnUrl=${finalIpnUrl}&orderId=${orderIdMomo}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${finalRedirectUrl}&requestId=${requestId}&requestType=captureWallet`;
 
         const signature = crypto.createHmac('sha256', secretKey)
             .update(rawSignature)
@@ -28,12 +32,12 @@ const MomoService = {
             amount,
             orderId: orderIdMomo, // Sử dụng mã unique vừa tạo
             orderInfo,
-            redirectUrl,
-            ipnUrl,
-            lang,
-            requestType,
-            autoCapture,
-            extraData,
+            redirectUrl: finalRedirectUrl,
+            ipnUrl: finalIpnUrl,
+            lang: 'vi',
+            requestType: 'captureWallet',
+            autoCapture: true,
+            extraData: '',
             signature
         });
 

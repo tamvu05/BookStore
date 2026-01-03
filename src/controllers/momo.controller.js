@@ -21,12 +21,21 @@ const MomoController = {
             const [rows] = await pool.query('SELECT TongTien FROM DonHang WHERE MaDH = ?', [orderId]);
             const totalAmount = rows[0].TongTien;
 
-            // Gọi MoMo Service
+            // Lấy domain hiện tại (hỗ trợ localhost và Render)
+            const protocol = req.protocol;
+            const host = req.get('host');
+            const baseUrl = `${protocol}://${host}`;
+            const redirectUrl = `${baseUrl}/checkout/momo/callback`;
+            const ipnUrl = `${baseUrl}/checkout/momo/ipn`;
+
+            // Gọi MoMo Service với redirectUrl động
             // Lưu ý: Service sẽ tự động nối thêm "_timestamp" vào orderId để tránh trùng
             const result = await MomoService.createPaymentRequest(
                 orderId.toString(),
                 Math.round(Number(totalAmount)),
-                `Thanh toan don hang #${orderId}`
+                `Thanh toan don hang #${orderId}`,
+                redirectUrl,
+                ipnUrl
             );
 
             if (result && result.payUrl) {
@@ -138,11 +147,20 @@ const MomoController = {
 
             const order = orders[0];
 
-            // Gọi MoMo Service để tạo link thanh toán mới
+            // Lấy domain hiện tại (hỗ trợ localhost và Render)
+            const protocol = req.protocol;
+            const host = req.get('host');
+            const baseUrl = `${protocol}://${host}`;
+            const redirectUrl = `${baseUrl}/checkout/momo/callback`;
+            const ipnUrl = `${baseUrl}/checkout/momo/ipn`;
+
+            // Gọi MoMo Service để tạo link thanh toán mới với redirectUrl động
             const result = await MomoService.createPaymentRequest(
                 orderId.toString(),
                 Math.round(Number(order.TongTien)),
-                `Thanh toan don hang #${orderId}`
+                `Thanh toan don hang #${orderId}`,
+                redirectUrl,
+                ipnUrl
             );
 
             if (result && result.payUrl) {
