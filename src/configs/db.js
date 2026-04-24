@@ -24,8 +24,6 @@ const pool = mysql.createPool({
     },
 })
 
-console.log('---------------------------------------------------')
-console.log('🔐 ĐANG KẾT NỐI CLOUD DATABASE (CÓ SSL)')
-console.log('---------------------------------------------------')
+console.log('Database connected successfully')
 
 export default pool
